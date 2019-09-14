@@ -30,7 +30,7 @@ import re
 flags = tf.flags
 
 FLAGS = flags.FLAGS
-base='./drive/My Drive/AI_COLAB/bert_tensor'
+base='./bert_quora'
 ## Required parameters
 # if os.name == 'nt':
 #     bert_path = 'D:\\Research\\multi_cased_L-12_H-768_A-12'
@@ -38,12 +38,13 @@ base='./drive/My Drive/AI_COLAB/bert_tensor'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = './drive/My Drive/AI_COLAB/bert_tensor/model_trained/multi_cased_L-12_H-768_A-12'
+bert_path = './drive/My Drive/AI_COLAB/BERT_tensor/uncased_L-12_H-768_A-12'
+project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(root_path, 'data'),
+    "data_dir", os.path.join(project_path, 'data'),
     "The input datadir.",
 )
 
@@ -57,7 +58,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir", os.path.join(root_path, 'model_trained/quora'),
+    "output_dir", os.path.join(project_path, 'model_trained/quora'),
     "The output directory where the model checkpoints will be written."
 )
 
@@ -116,7 +117,7 @@ tf.flags.DEFINE_string("master", None, "[Optional] TensorFlow master URL.")
 flags.DEFINE_integer(
     "num_tpu_cores", 8,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
-flags.DEFINE_string('data_config_path', os.path.join(root_path, 'data.conf'),
+flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
                     'data config file, which save train and dev config')
 
 
