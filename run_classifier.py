@@ -81,7 +81,7 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 
 flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
