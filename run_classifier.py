@@ -87,11 +87,11 @@ flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
 flags.DEFINE_bool("do_predict",True, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 4, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 32, "Total batch size for training.")
 
-flags.DEFINE_integer("eval_batch_size", 4, "Total batch size for eval.")
+flags.DEFINE_integer("eval_batch_size", 32, "Total batch size for eval.")
 
-flags.DEFINE_integer("predict_batch_size", 4, "Total batch size for predict.")
+flags.DEFINE_integer("predict_batch_size", 32, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-5, "The initial learning rate for Adam.")
 
