@@ -41,7 +41,7 @@ base='./bert_quora'
 bert_path = './drive/My Drive/AI_COLAB/BERT_tensor/uncased_L-12_H-768_A-12'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
     "data_dir", os.path.join(project_path, 'data'),
@@ -83,6 +83,11 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
 flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
+tf.flags.DEFINE_string(
+    "tpu_name",grpc://10.125.167.154:8470 ,
+    "The Cloud TPU to use for training. This should be either the name "
+    "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
+    "url.")
 
 flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
