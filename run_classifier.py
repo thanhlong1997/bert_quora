@@ -38,7 +38,7 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = '.'
+bert_path = 'gs.'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -54,7 +54,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "task_name", 'Uland', "The name of the task to train."
+    "task_name", 'QOP', "The name of the task to train."
 )
 
 flags.DEFINE_string(
@@ -84,7 +84,7 @@ flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
 flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.4.188.122:8470' ,
+    "tpu_name",'grpc://10.96.215.162:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
