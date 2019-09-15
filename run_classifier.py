@@ -54,7 +54,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "task_name", 'QOP', "The name of the task to train."
+    "task_name", 'Uland', "The name of the task to train."
 )
 
 flags.DEFINE_string(
