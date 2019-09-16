@@ -101,9 +101,9 @@ tf.flags.DEFINE_string(
     "specified, we will attempt to automatically detect the GCE project from "
     "metadata.")
 
-flags.DEFINE_bool("do_eval",False, "Whether to run eval on the dev set.")
+flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
-flags.DEFINE_bool("do_predict",True, "Whether to run the model in inference mode on the test set.")
+flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
 
 flags.DEFINE_integer("train_batch_size", 32, "Total batch size for training.")
 
@@ -768,8 +768,9 @@ def main(_):
       # will get dropped. So we pad with fake examples which are ignored
       # later on. These do NOT count towards the metric (all tf.metrics
       # support a per-instance weight, and these get a weight of 0.0).
-      # while len(eval_examples) % FLAGS.eval_batch_size != 0:
+      while len(eval_examples) % FLAGS.eval_batch_size != 0:
         # eval_examples.append(PaddingInputExample())
+        pass
 
     eval_file = os.path.join(FLAGS.output_dir, "eval.tf_record")
     file_based_convert_examples_to_features(
@@ -816,8 +817,8 @@ def main(_):
       # of examples must be a multiple of the batch size, or else examples
       # will get dropped. So we pad with fake examples which are ignored
       # later on.
-      # while len(predict_examples) % FLAGS.predict_batch_size != 0:
-        # predict_examples.append(PaddingInputExample())
+      while len(predict_examples) % FLAGS.predict_batch_size != 0:
+        predict_examples.append(PaddingInputExample())
             
     predict_file = os.path.join(FLAGS.output_dir, "predict.tf_record")
     file_based_convert_examples_to_features(predict_examples, label_list,
