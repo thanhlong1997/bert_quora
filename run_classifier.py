@@ -80,7 +80,7 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", True, "Whether to run training.")
+flags.DEFINE_bool("do_train", False, "Whether to run training.")
 
 flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
@@ -807,9 +807,9 @@ def main(_):
         writer.write("%s = %s\n" % (key, str(result[key])))
 
   if FLAGS.do_predict:
-    with open(FLAGS.output_dir + '/label2id.pkl', 'rb') as rf:
-          label2id = pickle.load(rf)
-          id2label = {value: key for key, value in label2id.items()}
+    # with open(FLAGS.output_dir + '/label2id.pkl', 'rb') as rf:
+          # label2id = pickle.load(rf)
+          # id2label = {value: key for key, value in label2id.items()}
     predict_examples = processor.get_test_examples(FLAGS.data_dir)
     num_actual_predict_examples = len(predict_examples)
     if FLAGS.use_tpu:
