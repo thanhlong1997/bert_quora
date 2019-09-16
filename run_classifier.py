@@ -769,7 +769,7 @@ def main(_):
       # later on. These do NOT count towards the metric (all tf.metrics
       # support a per-instance weight, and these get a weight of 0.0).
       while len(eval_examples) % FLAGS.eval_batch_size != 0:
-      #   eval_examples.append(PaddingInputExample())
+        eval_examples.append(PaddingInputExample())
             pass
 
     eval_file = os.path.join(FLAGS.output_dir, "eval.tf_record")
@@ -818,8 +818,8 @@ def main(_):
       # will get dropped. So we pad with fake examples which are ignored
       # later on.
       while len(predict_examples) % FLAGS.predict_batch_size != 0:
-        # predict_examples.append(PaddingInputExample())
-            pass
+        predict_examples.append(PaddingInputExample())
+            
     predict_file = os.path.join(FLAGS.output_dir, "predict.tf_record")
     file_based_convert_examples_to_features(predict_examples, label_list,
                                             FLAGS.max_seq_length, tokenizer,
