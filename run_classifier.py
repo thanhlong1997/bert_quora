@@ -770,7 +770,6 @@ def main(_):
       # support a per-instance weight, and these get a weight of 0.0).
       while len(eval_examples) % FLAGS.eval_batch_size != 0:
         eval_examples.append(PaddingInputExample())
-            pass
 
     eval_file = os.path.join(FLAGS.output_dir, "eval.tf_record")
     file_based_convert_examples_to_features(
