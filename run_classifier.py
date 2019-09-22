@@ -38,7 +38,7 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
+bert_path = 'gs://test_bucket_share_1/model_trained/quora2'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -58,13 +58,13 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/quora2',
+    "output_dir",'gs://test_bucket_share_1/model_trained/quora_param',
     "The output directory where the model checkpoints will be written."
 )
 
 ## Other parameters
 flags.DEFINE_string(
-    "init_checkpoint", os.path.join(bert_path, 'bert_model.ckpt'),
+    "init_checkpoint", os.path.join(bert_path, 'outputs_model.ckpt'),
     "Initial checkpoint (usually from a pre-trained BERT model)."
 )
 
