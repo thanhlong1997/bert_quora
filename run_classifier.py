@@ -64,7 +64,7 @@ flags.DEFINE_string(
 
 ## Other parameters
 flags.DEFINE_string(
-    "init_checkpoint", os.path.join(bert_path, 'model.ckpt'),
+    "init_checkpoint", os.path.join(bert_path, 'bert_model.ckpt'),
     "Initial checkpoint (usually from a pre-trained BERT model)."
 )
 
