@@ -80,9 +80,9 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", True, "Whether to run training.")
+flags.DEFINE_bool("do_train", False, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.64.224.90:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
