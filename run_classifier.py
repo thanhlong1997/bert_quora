@@ -44,7 +44,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_vn_param'),
+    "data_dir", os.path.join(project_path, 'data_vn_param/vi'),
     "The input datadir.",
 )
 
@@ -58,7 +58,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/param_only',
+    "output_dir",'gs://test_bucket_share_1/model_trained/param_only_vi',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -80,11 +80,11 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", False, "Whether to run training.")
+flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.77.9.234:8470' ,
+    "tpu_name",'grpc://10.23.23.50:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -101,9 +101,9 @@ tf.flags.DEFINE_string(
     "specified, we will attempt to automatically detect the GCE project from "
     "metadata.")
 
-flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
+flags.DEFINE_bool("do_eval",False, "Whether to run eval on the dev set.")
 
-flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
+flags.DEFINE_bool("do_predict",True, "Whether to run the model in inference mode on the test set.")
 
 flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
 
