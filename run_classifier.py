@@ -38,13 +38,13 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12/'
-project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
+bert_path = 'gs://test_bucket_share_1/model_trained/quora2'
+project_path='./drive/My Drive/AI_COLAB/BERT_tensor/data_10_9_A_B'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_vn_param/vi'),
+    "data_dir", os.path.join(project_path, 'parabank'),
     "The input datadir.",
 )
 
@@ -58,13 +58,13 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/param_only_vi',
+    "output_dir",'gs://test_bucket_share_1/model_trained/model_9_10',
     "The output directory where the model checkpoints will be written."
 )
 
 ## Other parameters
 flags.DEFINE_string(
-    "init_checkpoint", os.path.join(bert_path, 'bert_model.ckpt'),
+    "init_checkpoint", os.path.join(bert_path, 'outputs_model.ckpt-22740'),
     "Initial checkpoint (usually from a pre-trained BERT model)."
 )
 
@@ -80,11 +80,11 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", False, "Whether to run training.")
+flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.23.23.50:8470' ,
+    "tpu_name",'grpc://10.107.25.2:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -101,9 +101,9 @@ tf.flags.DEFINE_string(
     "specified, we will attempt to automatically detect the GCE project from "
     "metadata.")
 
-flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
+flags.DEFINE_bool("do_eval",False, "Whether to run eval on the dev set.")
 
-flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
+flags.DEFINE_bool("do_predict",True, "Whether to run the model in inference mode on the test set.")
 
 flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
 
