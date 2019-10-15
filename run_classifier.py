@@ -303,7 +303,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = None
   entity1=tokenizer.tokenize(example.entity1)
-  entity1=tokenizer.tokenize(example.entity2)
+  entity2=tokenizer.tokenize(example.entity2)
   if example.text_b:
       tokens_b = tokenizer.tokenize(example.text_b)
 
