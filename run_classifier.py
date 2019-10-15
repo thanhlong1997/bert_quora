@@ -357,7 +357,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       segment_ids.append(1)
   tokens.append("[SEP]")
   segment_ids.append(1)
-for en in entity2:
+  for en in entity2:
     tokens.append(en)
     segment_ids.append(1)
   tokens.append("[SEP]")
