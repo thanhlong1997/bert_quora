@@ -44,7 +44,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_10_9_A_B'),
+    "data_dir", os.path.join(project_path, 'data_add_feature'),
     "The input datadir.",
 )
 
@@ -58,7 +58,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/model_9_10',
+    "output_dir",'gs://test_bucket_share_1/model_trained/model_15_10',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -80,9 +80,9 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", False, "Whether to run training.")
+flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.107.25.2:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
@@ -101,9 +101,9 @@ tf.flags.DEFINE_string(
     "specified, we will attempt to automatically detect the GCE project from "
     "metadata.")
 
-flags.DEFINE_bool("do_eval",False, "Whether to run eval on the dev set.")
+flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
-flags.DEFINE_bool("do_predict",True, "Whether to run the model in inference mode on the test set.")
+flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
 
 flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
 
@@ -142,7 +142,7 @@ flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
 
-  def __init__(self, guid, text_a, text_b=None, label=None):
+  def __init__(self, guid, text_a, text_b=None, label=None,entity1,entity2):
     """Constructs a InputExample.
     Args:
       guid: Unique id for the example.
@@ -157,7 +157,8 @@ class InputExample(object):
     self.text_a = text_a
     self.text_b = text_b
     self.label = label
-
+    self.entity1=entity1
+    self.entity2=entity2
 
 class InputFeatures(object):
   """A single set of features of data."""
@@ -200,16 +201,20 @@ class DataProcessor(object):
       y = []
       X1 = []
       X2 = []
+      EN1=[]
+      EN2=[]
       df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
       for i in df.index:
           try:
-              y.append(str(int(df['is_duplicate'][i])))
-              X1.append(str(df['question1'][i]))
-              X2.append(str(df['question2'][i]))
+              y.append(str(int(df['label'][i])))
+              X1.append(str(df['q1'][i]))
+              X2.append(str(df['q2'][i]))
+              EN1.append(str(df['entity1']))
+              EN2.append(str(df['entity2']))
           # print('True:',i)
           except:
               pass
-      return (X1, X2, y)
+      return (X1, X2, y,EN1,EN2)
 
 
 class UlandProcessor(DataProcessor):
@@ -218,7 +223,7 @@ class UlandProcessor(DataProcessor):
     def get_train_examples(self, data_dir):
         """See base class."""
         print('PATH', os.path.join(data_dir, 'train.tsv'))
-        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'train.tsv'))
+        (X1,X2, Y,EN1,EN2) = self._read_csv(os.path.join(data_dir,'train.tsv'))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -233,8 +238,10 @@ class UlandProcessor(DataProcessor):
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
             label = tokenization.convert_to_unicode(Y[i])
+            en1=tokenization.convert_to_unicode(EN1[i])
+            en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
+                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
         return examples
     def get_test_examples(self, data_dir):
         """See base class."""
@@ -253,8 +260,10 @@ class UlandProcessor(DataProcessor):
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
             label = tokenization.convert_to_unicode(Y[i])
+            en1=tokenization.convert_to_unicode(EN1[i])
+            en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
+                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
         return examples
 
     def get_dev_examples(self, data_dir):
@@ -274,8 +283,10 @@ class UlandProcessor(DataProcessor):
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
             label = tokenization.convert_to_unicode(Y[i])
+            en1=tokenization.convert_to_unicode(EN1[i])
+            en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
+                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
         return examples
     def get_labels(self):
         """See base class."""
@@ -292,6 +303,8 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       pickle.dump(label_map, w)
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = None
+  entity1=tokenizer.tokenize(example.entity1)
+  entity1=tokenizer.tokenize(example.entity2)
   if example.text_b:
       tokens_b = tokenizer.tokenize(example.text_b)
 
@@ -300,10 +313,12 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       # length is less than the specified length.
       # Account for [CLS], [SEP], [SEP] with "- 3"
       _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
+      _truncate_seq_pair(entity1, entity2, max_seq_length - 3)
   else:
       # Account for [CLS] and [SEP] with "- 2"
       if len(tokens_a) > max_seq_length - 2:
           tokens_a = tokens_a[0:(max_seq_length - 2)]
+          entity1=entity1[0:(max_seq_length-2)]
   # The convention in BERT is:
   # (a) For sequence pairs:
   #  tokens:   [CLS] is this jack ##son ##ville ? [SEP] no it is not . [SEP]
@@ -331,13 +346,22 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     segment_ids.append(0)
   tokens.append("[SEP]")
   segment_ids.append(0)
+  for en in entity1:
+    tokens.append(en)
+    segment_ids.append(0)
+  tokens.append("[SEP]")
+  segment_ids.append(0)
 
   for token in tokens_b:
       tokens.append(token)
       segment_ids.append(1)
   tokens.append("[SEP]")
   segment_ids.append(1)
-
+for en in entity2:
+    tokens.append(en)
+    segment_ids.append(1)
+  tokens.append("[SEP]")
+  segment_ids.append(1)
   input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
   # The mask has 1 for real tokens and 0 for padding tokens. Only real
