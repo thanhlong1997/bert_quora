@@ -74,7 +74,7 @@ flags.DEFINE_bool(
 )
 
 flags.DEFINE_integer(
-    "max_seq_length", 800,
+    "max_seq_length", 512,
     "The maximum total input sequence length after WordPiece tokenization."
 )
 
@@ -284,6 +284,12 @@ class UlandProcessor(DataProcessor):
             label = tokenization.convert_to_unicode(Y[i])
             en1=tokenization.convert_to_unicode(EN1[i])
             en2=tokenization.convert_to_unicode(EN2[i])
+            if len(text1)+len(text2)+len(en1)+len(en2)+5>512:
+              back=((len(text1)+len(text2)+len(en1)+len(en2))-507)//4+1
+              text1=text1[:len(text1)-back]
+              text2=text2[:len(text2)-back]
+              en1=en1[:len(en1)-back]
+              en2=en2[:len(en2)-back]
             examples.append(
                     InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
         return examples
