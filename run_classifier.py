@@ -317,8 +317,8 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       # Modifies `tokens_a` and `tokens_b` in place so that the total
       # length is less than the specified length.
       # Account for [CLS], [SEP], [SEP] with "- 3"
-      _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
-      _truncate_seq_pair(entity1, entity2, max_seq_length - 3)
+      _truncate_seq_pair(tokens_a.extend(entity1), tokens_b.extend(entity2), max_seq_length - 5)
+      # _truncate_seq_pair(entity1, entity2, max_seq_length - 3)
   else:
       # Account for [CLS] and [SEP] with "- 2"
       if len(tokens_a) > max_seq_length - 2:
@@ -372,13 +372,13 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   # The mask has 1 for real tokens and 0 for padding tokens. Only real
   # tokens are attended to.
   input_mask = [1] * len(input_ids)
-
+  print(len(input_ids))
   # Zero-pad up to the sequence length.
   while len(input_ids) < max_seq_length:
     input_ids.append(0)
     input_mask.append(0)
     segment_ids.append(0)
-  print(len(input_ids))
+
   print(example.text_a)
   assert len(input_ids) == max_seq_length
   assert len(input_mask) == max_seq_length
