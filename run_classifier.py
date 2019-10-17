@@ -284,12 +284,6 @@ class UlandProcessor(DataProcessor):
             label = tokenization.convert_to_unicode(Y[i])
             en1=tokenization.convert_to_unicode(EN1[i])
             en2=tokenization.convert_to_unicode(EN2[i])
-            if len(text1)+len(text2)+len(en1)+len(en2)+5>512:
-              back=((len(text1)+len(text2)+len(en1)+len(en2))-507)//4+1
-              text1=text1[:len(text1)-back]
-              text2=text2[:len(text2)-back]
-              en1=en1[:len(en1)-back]
-              en2=en2[:len(en2)-back]
             examples.append(
                     InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
         return examples
@@ -306,34 +300,23 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       label_map[label] = i
   with open(os.path.join(FLAGS.output_dir,"/label2id.pkl"), 'wb') as w:
       pickle.dump(label_map, w)
-  tokens_a = tokenizer.tokenize(example.text_a)
+  tokens_a = tokenizer.tokenize(example.text_a+'[SEP]'+' '+example.entity1)
   tokens_b = None
-  entity1s=tokenizer.tokenize(example.entity1)
-  entity2s=tokenizer.tokenize(example.entity2)
+  # entity1s=tokenizer.tokenize(example.entity1)
+  # entity2s=tokenizer.tokenize(example.entity2)
   if example.text_b:
-      tokens_b = tokenizer.tokenize(example.text_b)
+      tokens_b = tokenizer.tokenize(example.text_b+'[SEP]'+' '+example.entity2)
 
   if tokens_b:
       # Modifies `tokens_a` and `tokens_b` in place so that the total
       # length is less than the specified length.
       # Account for [CLS], [SEP], [SEP] with "- 3"
-      a=[]
-      for item in tokens_a:
-        a.append(item)
-      for item in entity1s:
-        a.append(item)
-      b=[]
-      for item in tokens_b:
-        b.append(item)
-      for item in entity2s:
-        b.append(item)
-      _truncate_seq_pair(a, b, max_seq_length - 5)
+      _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
       # _truncate_seq_pair(entity1, entity2, max_seq_length - 3)
   else:
       # Account for [CLS] and [SEP] with "- 2"
       if len(tokens_a) > max_seq_length - 2:
           tokens_a = tokens_a[0:(max_seq_length - 2)]
-          entity1=entity1s[0:(max_seq_length-2)]
   # The convention in BERT is:
   # (a) For sequence pairs:
   #  tokens:   [CLS] is this jack ##son ##ville ? [SEP] no it is not . [SEP]
