@@ -244,7 +244,7 @@ class UlandProcessor(DataProcessor):
         return examples
     def get_test_examples(self, data_dir):
         """See base class."""
-        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'test.tsv'))
+        (X1,X2, Y,EN1,EN2) = self._read_csv(os.path.join(data_dir,'test.tsv'))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -267,7 +267,7 @@ class UlandProcessor(DataProcessor):
 
     def get_dev_examples(self, data_dir):
         """See base class."""
-        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'dev.tsv'))
+        (X1,X2, Y,EN1,EN2) = self._read_csv(os.path.join(data_dir,'dev.tsv'))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -308,8 +308,8 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       pickle.dump(label_map, w)
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = None
-  entity1=tokenizer.tokenize(example.entity1)
-  entity2=tokenizer.tokenize(example.entity2)
+  entity1s=tokenizer.tokenize(example.entity1)
+  entity2s=tokenizer.tokenize(example.entity2)
   if example.text_b:
       tokens_b = tokenizer.tokenize(example.text_b)
 
@@ -317,13 +317,23 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       # Modifies `tokens_a` and `tokens_b` in place so that the total
       # length is less than the specified length.
       # Account for [CLS], [SEP], [SEP] with "- 3"
-      _truncate_seq_pair(tokens_a.extend(entity1), tokens_b.extend(entity2), max_seq_length - 5)
+      a=[]
+      for item in tokens_a:
+        a.append(item)
+      for item in entity1s:
+        a.append(item)
+      b=[]
+      for item in tokens_b:
+        b.append(item)
+      for item in entity2s:
+        b.append(item)
+      _truncate_seq_pair(a, b, max_seq_length - 5)
       # _truncate_seq_pair(entity1, entity2, max_seq_length - 3)
   else:
       # Account for [CLS] and [SEP] with "- 2"
       if len(tokens_a) > max_seq_length - 2:
           tokens_a = tokens_a[0:(max_seq_length - 2)]
-          entity1=entity1[0:(max_seq_length-2)]
+          entity1=entity1s[0:(max_seq_length-2)]
   # The convention in BERT is:
   # (a) For sequence pairs:
   #  tokens:   [CLS] is this jack ##son ##ville ? [SEP] no it is not . [SEP]
@@ -351,7 +361,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     segment_ids.append(0)
   tokens.append("[SEP]")
   segment_ids.append(0)
-  for en in entity1:
+  for en in entity1s:
     tokens.append(en)
     segment_ids.append(0)
   tokens.append("[SEP]")
@@ -362,7 +372,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       segment_ids.append(1)
   tokens.append("[SEP]")
   segment_ids.append(1)
-  for en in entity2:
+  for en in entity2s:
     tokens.append(en)
     segment_ids.append(1)
   tokens.append("[SEP]")
