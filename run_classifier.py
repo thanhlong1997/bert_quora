@@ -287,6 +287,7 @@ class UlandProcessor(DataProcessor):
             examples.append(
                     InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
         return examples
+
     def get_labels(self):
         """See base class."""
         return ['1', '0']
@@ -344,22 +345,13 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     segment_ids.append(0)
   tokens.append("[SEP]")
   segment_ids.append(0)
-  for en in entity1s:
-    tokens.append(en)
-    segment_ids.append(0)
-  tokens.append("[SEP]")
-  segment_ids.append(0)
 
   for token in tokens_b:
       tokens.append(token)
       segment_ids.append(1)
   tokens.append("[SEP]")
   segment_ids.append(1)
-  for en in entity2s:
-    tokens.append(en)
-    segment_ids.append(1)
-  tokens.append("[SEP]")
-  segment_ids.append(1)
+  
   input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
   # The mask has 1 for real tokens and 0 for padding tokens. Only real
