@@ -44,7 +44,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_add_feature'),
+    "data_dir", os.path.join(project_path, 'data_10_9_A_B'),
     "The input datadir.",
 )
 
@@ -58,7 +58,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/model_1_11',
+    "output_dir",'gs://test_bucket_share_1/model_trained/model_9_10',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -113,7 +113,7 @@ flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-5, "The initial learning rate for Adam.")
 
-flags.DEFINE_float("num_train_epochs", 7.0, "Total number of training epochs to perform.")
+flags.DEFINE_float("num_train_epochs", 5.0, "Total number of training epochs to perform.")
 flags.DEFINE_float('droupout_rate', 0.5, 'Dropout rate')
 flags.DEFINE_float('clip', 5, 'Gradient clip')
 flags.DEFINE_float(
@@ -156,8 +156,8 @@ class InputExample(object):
     self.text_a = text_a
     self.text_b = text_b
     self.label = label
-    self.entity1=entity1
-    self.entity2=entity2
+    # self.entity1=entity1
+    # self.entity2=entity2
 
 class InputFeatures(object):
   """A single set of features of data."""
@@ -200,20 +200,20 @@ class DataProcessor(object):
       y = []
       X1 = []
       X2 = []
-      EN1=[]
-      EN2=[]
+      # EN1=[]
+      # EN2=[]
       df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
       for i in df.index:
           try:
-              y.append(str(int(df['label'][i])))
-              X1.append(str(df['q1'][i]))
-              X2.append(str(df['q2'][i]))
-              EN1.append(str(df['entity1']))
-              EN2.append(str(df['entity2']))
+              y.append(str(int(df['is_duplicate'][i])))
+              X1.append(str(df['question1'][i]))
+              X2.append(str(df['question2'][i]))
+              # EN1.append(str(df['entity1']))
+              # EN2.append(str(df['entity2']))
           # print('True:',i)
           except:
               pass
-      return (X1, X2, y,EN1,EN2)
+      return (X1, X2, y)
 
 
 class UlandProcessor(DataProcessor):
@@ -222,7 +222,7 @@ class UlandProcessor(DataProcessor):
     def get_train_examples(self, data_dir):
         """See base class."""
         print('PATH', os.path.join(data_dir, 'train.tsv'))
-        (X1,X2, Y,EN1,EN2) = self._read_csv(os.path.join(data_dir,'train.tsv'))
+        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'train.tsv'))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -237,14 +237,14 @@ class UlandProcessor(DataProcessor):
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
             label = tokenization.convert_to_unicode(Y[i])
-            en1=tokenization.convert_to_unicode(EN1[i])
-            en2=tokenization.convert_to_unicode(EN2[i])
+            # en1=tokenization.convert_to_unicode(EN1[i])
+            # en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
+                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
         return examples
     def get_test_examples(self, data_dir):
         """See base class."""
-        (X1,X2, Y,EN1,EN2) = self._read_csv(os.path.join(data_dir,'test.tsv'))
+        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'test.tsv'))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -259,15 +259,15 @@ class UlandProcessor(DataProcessor):
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
             label = tokenization.convert_to_unicode(Y[i])
-            en1=tokenization.convert_to_unicode(EN1[i])
-            en2=tokenization.convert_to_unicode(EN2[i])
+            # en1=tokenization.convert_to_unicode(EN1[i])
+            # en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
+                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
         return examples
 
     def get_dev_examples(self, data_dir):
         """See base class."""
-        (X1,X2, Y,EN1,EN2) = self._read_csv(os.path.join(data_dir,'dev.tsv'))
+        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'dev.tsv'))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -282,10 +282,10 @@ class UlandProcessor(DataProcessor):
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
             label = tokenization.convert_to_unicode(Y[i])
-            en1=tokenization.convert_to_unicode(EN1[i])
-            en2=tokenization.convert_to_unicode(EN2[i])
+            # en1=tokenization.convert_to_unicode(EN1[i])
+            # en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label,entity1=en1,entity2=en2))
+                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
         return examples
 
     def get_labels(self):
@@ -301,12 +301,14 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       label_map[label] = i
   with open(os.path.join(FLAGS.output_dir,"/label2id.pkl"), 'wb') as w:
       pickle.dump(label_map, w)
-  tokens_a = tokenizer.tokenize(example.text_a+'[SEP]'+' '+example.entity1)
+  tokens_a = tokenizer.tokenize(example.text_a)
+  	# +'[SEP]'+' '+example.entity1)
   tokens_b = None
   # entity1s=tokenizer.tokenize(example.entity1)
   # entity2s=tokenizer.tokenize(example.entity2)
   if example.text_b:
-      tokens_b = tokenizer.tokenize(example.text_b+'[SEP]'+' '+example.entity2)
+      tokens_b = tokenizer.tokenize(example.text_b)
+      	# +'[SEP]'+' '+example.entity2)
 
   if tokens_b:
       # Modifies `tokens_a` and `tokens_b` in place so that the total
