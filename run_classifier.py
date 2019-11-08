@@ -232,7 +232,7 @@ class UlandProcessor(DataProcessor):
             #     continue
         	guid = "train-%d" % (i)
         	if not isinstance(X1[i], str):
-                continue
+            	continue
             try:
             	text1 = tokenization.convert_to_unicode(X1[i])
             	text2 = tokenization.convert_to_unicode(X2[i])
@@ -243,7 +243,7 @@ class UlandProcessor(DataProcessor):
                     	InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
             except:
             	pass
-        return examples
+    	return examples
     def get_test_examples(self, data_dir):
         """See base class."""
         (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'test.tsv'))
