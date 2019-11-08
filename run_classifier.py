@@ -232,7 +232,7 @@ class UlandProcessor(DataProcessor):
             #     continue
         	guid = "train-%d" % (i)
         	if not isinstance(X1[i], str):
-            	continue
+           		continue
             try:
             	text1 = tokenization.convert_to_unicode(X1[i])
             	text2 = tokenization.convert_to_unicode(X2[i])
