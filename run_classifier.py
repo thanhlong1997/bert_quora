@@ -233,7 +233,7 @@ class UlandProcessor(DataProcessor):
         	guid = "train-%d" % (i)
         	if not isinstance(X1[i], str):
            		continue
-            try:
+           	try:
             	text1 = tokenization.convert_to_unicode(X1[i])
             	text2 = tokenization.convert_to_unicode(X2[i])
             	label = tokenization.convert_to_unicode(Y[i])
@@ -241,7 +241,7 @@ class UlandProcessor(DataProcessor):
             # en2=tokenization.convert_to_unicode(EN2[i])
             	examples.append(
                     	InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
-            except:
+           	except:
             	pass
     	return examples
     def get_test_examples(self, data_dir):
