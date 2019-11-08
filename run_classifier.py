@@ -205,8 +205,8 @@ class DataProcessor(object):
       df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
       for i in df.index:
         y.append(str(int(df['label'][i])))
-        X1.append(str(df['q1'][i]+' [CLS] '+df['entity1'][i]))
-        X2.append(str(df['q2'][i]+' [SEP] '+df['entity2'][i]))
+        X1.append(str(df['q1'][i])+' [CLS] '+str(df['entity1'][i]))
+        X2.append(str(df['q2'][i])+' [SEP] '+str(df['entity2'][i]))
               # EN1.append(str(df['entity1']))
               # EN2.append(str(df['entity2']))
           # print('True:',i)
