@@ -44,7 +44,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_10_9_A_B'),
+    "data_dir", os.path.join(project_path, 'data_add_feature'),
     "The input datadir.",
 )
 
@@ -58,7 +58,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/model_9_10',
+    "output_dir",'gs://test_bucket_share_1/model_trained/model_8_11',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -80,9 +80,9 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", False, "Whether to run training.")
+flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.18.53.146:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
@@ -105,7 +105,7 @@ flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
 flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 16, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 64, "Total batch size for training.")
 
 flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
 
@@ -113,7 +113,7 @@ flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-5, "The initial learning rate for Adam.")
 
-flags.DEFINE_float("num_train_epochs", 5.0, "Total number of training epochs to perform.")
+flags.DEFINE_float("num_train_epochs", 10.0, "Total number of training epochs to perform.")
 flags.DEFINE_float('droupout_rate', 0.5, 'Dropout rate')
 flags.DEFINE_float('clip', 5, 'Gradient clip')
 flags.DEFINE_float(
@@ -205,9 +205,9 @@ class DataProcessor(object):
       df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
       for i in df.index:
           try:
-              y.append(str(int(df['is_duplicate'][i])))
-              X1.append(str(df['question1'][i]))
-              X2.append(str(df['question2'][i]))
+              y.append(str(int(df['label'][i])))
+              X1.append(str(df['q1'][i]+' [CLS] '+df['entity1'][i]))
+              X2.append(str(df['q2'][i]+' [SEP] '+df['entity2'][i]))
               # EN1.append(str(df['entity1']))
               # EN2.append(str(df['entity2']))
           # print('True:',i)
