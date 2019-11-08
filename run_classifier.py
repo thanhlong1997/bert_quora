@@ -230,8 +230,8 @@ class UlandProcessor(DataProcessor):
         	print(i)
             # if i == 0:
             #     continue
-            guid = "train-%d" % (i)
-            if not isinstance(X1[i], str):
+        	guid = "train-%d" % (i)
+        	if not isinstance(X1[i], str):
                 continue
             try:
             	text1 = tokenization.convert_to_unicode(X1[i])
