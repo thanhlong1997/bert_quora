@@ -84,7 +84,7 @@ flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
 flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.18.53.146:8470' ,
+    "tpu_name",'grpc://10.100.230.218:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -204,15 +204,13 @@ class DataProcessor(object):
       # EN2=[]
       df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
       for i in df.index:
-          try:
-              y.append(str(int(df['label'][i])))
-              X1.append(str(df['q1'][i]+' [CLS] '+df['entity1'][i]))
-              X2.append(str(df['q2'][i]+' [SEP] '+df['entity2'][i]))
+        y.append(str(int(df['label'][i])))
+        X1.append(str(df['q1'][i]+' [CLS] '+df['entity1'][i]))
+        X2.append(str(df['q2'][i]+' [SEP] '+df['entity2'][i]))
               # EN1.append(str(df['entity1']))
               # EN2.append(str(df['entity2']))
           # print('True:',i)
-          except:
-              pass
+          
       return (X1, X2, y)
 
 
@@ -229,6 +227,7 @@ class UlandProcessor(DataProcessor):
         print("------------------------------------------------")
         examples = []
         for i in range(len(X1)):
+        	print(i)
             # if i == 0:
             #     continue
             guid = "train-%d" % (i)
