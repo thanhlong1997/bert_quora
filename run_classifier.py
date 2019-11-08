@@ -227,7 +227,7 @@ class UlandProcessor(DataProcessor):
         print("------------------------------------------------")
         examples = []
         for i in range(len(X1)):
-            print(i)
+            # print(i)
             # if i == 0:
             #     continue
             guid = "train-%d" % (i)
