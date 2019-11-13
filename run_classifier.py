@@ -250,10 +250,10 @@ class UlandProcessor(DataProcessor):
         X1=[]
         X2=[]
         df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
-      		for i in df.index:
-        	# y.append(str(int(df['label'][i])))
-        	X1.append(str(df['q1'][i])+' [CLS] '+str(df['entity1'][i]))
-        	X2.append(str(df['q2'][i])+' [SEP] '+str(df['entity2'][i]))
+        for i in df.index:
+            # y.append(str(int(df['label'][i])))
+            X1.append(str(df['q1'][i])+' [CLS] '+str(df['entity1'][i]))
+            X2.append(str(df['q2'][i])+' [SEP] '+str(df['entity2'][i]))
         # num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         # print('NUM Yes: ', num_yes)
