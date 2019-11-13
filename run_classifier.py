@@ -888,13 +888,13 @@ def main(_):
     assert num_written_lines == num_actual_predict_examples
 
 
-if __name__ == "__main__":
-  flags.mark_flag_as_required("data_dir")
-  flags.mark_flag_as_required("task_name")
-  flags.mark_flag_as_required("vocab_file")
-  flags.mark_flag_as_required("bert_config_file")
-  flags.mark_flag_as_required("output_dir")
-  tf.app.run()
+# if __name__ == "__main__":
+#   flags.mark_flag_as_required("data_dir")
+#   flags.mark_flag_as_required("task_name")
+#   flags.mark_flag_as_required("vocab_file")
+#   flags.mark_flag_as_required("bert_config_file")
+#   flags.mark_flag_as_required("output_dir")
+#   tf.app.run()
 
 import re
 class Bert_classifi(object):
@@ -1071,6 +1071,6 @@ class Bert_classifi(object):
         else:
             print(self.predict_raw_sentence(text1,text2))
 
-# classifi=Bert_classifi()
-# classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
-#               'en Typically, each language will have a corresponding reader')
+classifi=Bert_classifi()
+classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
+              'en Typically, each language will have a corresponding reader')
