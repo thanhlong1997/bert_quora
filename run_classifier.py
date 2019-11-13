@@ -1004,7 +1004,7 @@ class Bert_classifi(object):
         fetures=self.convert_example_to_features(sentence1,sentence2,
                                                  FLAGS.max_seq_length, self.tokenizer)
         predict, prob= self.sess.run([self.predict, self.prob],feed_dict=self.get_feed_dict(fetures))
-        return self.label_map[ list(predict)[0]], prob[0][predict[0]]
+        return int(self.label_map[ list(predict)[0]]), prob[0][predict[0]]
 
     def convert_single_prediction_example(self, sentence1 , sentence2, max_seq_length, tokenizer):
         textlist1 = re.split(r"\s+",sentence1)
@@ -1075,5 +1075,12 @@ class Bert_classifi(object):
             print(self.predict_raw_sentence(text1,text2))
 
 classifi=Bert_classifi()
-classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
-              'en Typically, each language will have a corresponding reader')
+# classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
+#               'en Typically, each language will have a corresponding reader')
+data={'test_id':[],'is_duplicate':[]}
+df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+for index in df.index:
+    data['test_id'].append(df['id'][index])
+    data['is_duplicate'].append(classifi.predict_raw_sentence(df['q1'][index]+' [CLS] '+df['entity1'][index],df['q2'][index]+' [SEP] '+df['entity2'][index])[0])
+data=pd.DataFrame()
+data.to_csv('result.csv')
