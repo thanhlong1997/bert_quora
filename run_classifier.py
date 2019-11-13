@@ -249,7 +249,7 @@ class UlandProcessor(DataProcessor):
         # (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'test.tsv'))
         X1=[]
         X2=[]
-        df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             # y.append(str(int(df['label'][i])))
             X1.append(str(df['q1'][i])+' [CLS] '+str(df['entity1'][i]))
