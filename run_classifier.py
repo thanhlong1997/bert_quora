@@ -913,8 +913,11 @@ class Bert_classifi(object):
         self.ori_eval_features = []
         self.tokenizer = tokenization.FullTokenizer(
             vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
-        with open(os.path.join(FLAGS.output_dir, 'label2id.pkl'), 'rb') as w:
-            label_map= pickle.load(w)
+        label_map = {}
+        for (i, label) in enumerate(self.label_list):
+            label_map[label] = i
+        # with open(os.path.join(FLAGS.output_dir, 'label2id.pkl'), 'rb') as w:
+        #     label_map= pickle.load(w)
         self.label_map = dict((v, k) for k, v in label_map.items())
         pass
 
