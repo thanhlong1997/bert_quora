@@ -80,7 +80,7 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", True, "Whether to run training.")
+flags.DEFINE_bool("do_train", False, "Whether to run training.")
 
 flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
@@ -101,9 +101,9 @@ tf.flags.DEFINE_string(
     "specified, we will attempt to automatically detect the GCE project from "
     "metadata.")
 
-flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
+flags.DEFINE_bool("do_eval",False, "Whether to run eval on the dev set.")
 
-flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
+flags.DEFINE_bool("do_predict",True, "Whether to run the model in inference mode on the test set.")
 
 flags.DEFINE_integer("train_batch_size", 64, "Total batch size for training.")
 
