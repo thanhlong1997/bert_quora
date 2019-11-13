@@ -302,14 +302,14 @@ class UlandProcessor(DataProcessor):
         return ['1', '0']
 
 
-def convert_single_example(ex_index, example, label_list, max_seq_length,
+def convert_single_example(ex_index, example, max_seq_length,
                            tokenizer):
   """Converts a single `InputExample` into a single `InputFeatures`."""
-  label_map = {}
-  for (i, label) in enumerate(label_list):
-      label_map[label] = i
-  with open(os.path.join(FLAGS.output_dir,"/label2id.pkl"), 'wb') as w:
-      pickle.dump(label_map, w)
+  # label_map = {}
+  # for (i, label) in enumerate(label_list):
+  #     label_map[label] = i
+  # with open(os.path.join(FLAGS.output_dir,"/label2id.pkl"), 'wb') as w:
+  #     pickle.dump(label_map, w)
   tokens_a = tokenizer.tokenize(example.text_a)
     # +'[SEP]'+' '+example.entity1)
   tokens_b = None
@@ -402,7 +402,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
 
 
 def file_based_convert_examples_to_features(
-    examples, label_list, max_seq_length, tokenizer, output_file):
+    examples, max_seq_length, tokenizer, output_file):
   """Convert a set of `InputExample`s to a TFRecord file."""
 
   writer = tf.python_io.TFRecordWriter(output_file)
@@ -411,11 +411,12 @@ def file_based_convert_examples_to_features(
     if ex_index % 10000 == 0:
       tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
 
-    feature = convert_single_example(ex_index, example, label_list,
+    feature = convert_single_example(ex_index, example,
                                      max_seq_length, tokenizer)
 
     def create_int_feature(values):
-      f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+      # f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+      f = list(values)
       return f
 
     features = collections.OrderedDict()
@@ -435,9 +436,9 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
   name_to_features = {
       "input_ids": tf.FixedLenFeature([seq_length], tf.int64),
       "input_mask": tf.FixedLenFeature([seq_length], tf.int64),
-      "segment_ids": tf.FixedLenFeature([seq_length], tf.int64),
-      "label_ids": tf.FixedLenFeature([], tf.int64),
-  }
+      "segment_ids": tf.FixedLenFeature([seq_length], tf.int64),}
+      # "label_ids": tf.FixedLenFeature([], tf.int64),
+
 
   def _decode_record(record, name_to_features):
     """Decodes a record to a TensorFlow example."""
