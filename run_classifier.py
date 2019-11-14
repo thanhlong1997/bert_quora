@@ -1080,7 +1080,11 @@ classifi=Bert_classifi()
 data={'test_id':[],'is_duplicate':[]}
 df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
 for index in df.index:
-    data['test_id'].append(df['id'][index])
-    data['is_duplicate'].append(classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0])
+	try:
+		data['is_duplicate'].append(classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0])
+    	data['test_id'].append(df['id'][index])
+    except:
+    	print(index)
+    	pass
 data=pd.DataFrame()
 data.to_csv('result.csv')
