@@ -1086,5 +1086,5 @@ for index in df.index:
     except:
         print(index)
         pass
-data=pd.DataFrame()
+data=pd.DataFrame(data)
 data.to_csv('result.csv')
