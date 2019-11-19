@@ -1083,7 +1083,7 @@ df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-
 for index in df.index:
     try:
         label=classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
-        print(label)
+        # print(label)
         data['is_duplicate'].append(int(label))
         data['test_id'].append(df['id'][index])
     except:
