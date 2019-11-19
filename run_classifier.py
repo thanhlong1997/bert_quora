@@ -1090,4 +1090,4 @@ for index in df.index:
         print(index)
         pass
 data=pd.DataFrame(data)
-data.to_csv('result.csv')
+data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/result.csv')
