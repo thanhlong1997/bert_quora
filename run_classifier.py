@@ -1078,16 +1078,25 @@ classifi=Bert_classifi()
 # classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
 #               'en Typically, each language will have a corresponding reader')
 # print(classifi.predict_raw_sentence('How does the Surface Pro himself 4 compare with iPad Pro?','Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?')[0])
-data={'test_id':[],'is_duplicate':[]}
-df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
-for index in df.index:
+i=0
+directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/division_data')
+for file in os.listdir(directory):
+  print(i)
+  filename = os.fsdecode(file)
+  print(filename)
+  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/division_data',filename)
+  data={'test_id':[],'is_duplicate':[]}
+  df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+  for index in df.index:
     try:
         label=classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
         # print(label)
         data['is_duplicate'].append(int(label))
         data['test_id'].append(df['id'][index])
     except:
-        print(index)
+        data['is_duplicate'].append(0)
+        data['test_id'].append(df['id'][index])
         pass
-data=pd.DataFrame(data)
-data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/result.csv',index=False,sep=',')
+  data=pd.DataFrame(data)
+  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/result'+str(i)+'.csv',index=False,sep=',')
+  i+=1
