@@ -1077,14 +1077,15 @@ class Bert_classifi(object):
 classifi=Bert_classifi()
 # classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
 #               'en Typically, each language will have a corresponding reader')
-data={'test_id':[],'is_duplicate':[]}
-df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
-for index in df.index:
-    try:
-        data['is_duplicate'].append(classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0])
-        data['test_id'].append(df['id'][index])
-    except:
-        print(index)
-        pass
-data=pd.DataFrame(data)
-data.to_csv('result.csv')
+classifi.predict_raw_sentence('How does the Surface Pro himself 4 compare with iPad Pro?','Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?')
+# data={'test_id':[],'is_duplicate':[]}
+# df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+# for index in df.index:
+#     try:
+#         data['is_duplicate'].append(classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0])
+#         data['test_id'].append(df['id'][index])
+#     except:
+#         print(index)
+#         pass
+# data=pd.DataFrame(data)
+# data.to_csv('result.csv')
