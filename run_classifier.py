@@ -1077,7 +1077,7 @@ class Bert_classifi(object):
 classifi=Bert_classifi()
 # classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
 #               'en Typically, each language will have a corresponding reader')
-print(classifi.predict_raw_sentence('How does the Surface Pro himself 4 compare with iPad Pro?','Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?'))
+print(classifi.predict_raw_sentence('How does the Surface Pro himself 4 compare with iPad Pro?','Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?')[0])
 # data={'test_id':[],'is_duplicate':[]}
 # df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
 # for index in df.index:
