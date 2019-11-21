@@ -1086,7 +1086,7 @@ for file in os.listdir(directory):
   print(filename)
   filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/division_data',filename)
   data={'test_id':[],'is_duplicate':[]}
-  df=pd.read_csv(os.path.join(FLAGS.data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+  df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
   for index in df.index:
     try:
         label=classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
