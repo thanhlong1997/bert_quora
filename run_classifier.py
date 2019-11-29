@@ -44,7 +44,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_add_feature'),
+    "data_dir", os.path.join(project_path, 'data_no_add_feature'),
     "The input datadir.",
 )
 
@@ -1079,17 +1079,18 @@ classifi=Bert_classifi()
 #               'en Typically, each language will have a corresponding reader')
 # print(classifi.predict_raw_sentence('How does the Surface Pro himself 4 compare with iPad Pro?','Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?')[0])
 i=0
-directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/division_data')
+directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti')
 for file in os.listdir(directory):
   print(i)
   filename = os.fsdecode(file)
   print(filename)
-  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/division_data',filename)
+  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti',filename)
   data={'test_id':[],'is_duplicate':[]}
   df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
   for index in df.index:
     try:
-        label=classifi.predict_raw_sentence(str(df['q1'][index])+' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
+        label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
+                                            # +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
         # print(label)
         data['is_duplicate'].append(int(label))
         data['test_id'].append(df['id'][index])
@@ -1098,5 +1099,5 @@ for file in os.listdir(directory):
         data['test_id'].append(df['id'][index])
         pass
   data=pd.DataFrame(data)
-  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/result'+str(i)+'.csv',index=False,sep=',')
+  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/result_no_entiti'+str(i)+'.csv',index=False,sep=',')
   i+=1
