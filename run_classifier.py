@@ -1093,10 +1093,10 @@ for file in os.listdir(directory):
                                             # +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
         # print(label)
         data['is_duplicate'].append(int(label))
-        data['test_id'].append(df['id'][index])
+        data['test_id'].append(df['test_id'][index])
     except:
         data['is_duplicate'].append(0)
-        data['test_id'].append(df['id'][index])
+        data['test_id'].append(df['test_id'][index])
         pass
   data=pd.DataFrame(data)
   data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/result_no_entiti'+str(i)+'.csv',index=False,sep=',')
