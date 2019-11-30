@@ -1099,5 +1099,5 @@ for file in os.listdir(directory):
         data['test_id'].append(df['test_id'][index])
         pass
   data=pd.DataFrame(data)
-  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/result_no_entiti'+str(i)+'.csv',index=False,sep=',')
+  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict'+str(i)+'.csv',index=False,sep=',')
   i+=1
