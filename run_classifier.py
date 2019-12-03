@@ -44,7 +44,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_no_add_feature'),
+    "data_dir", os.path.join(project_path, 'data_add_feature'),
     "The input datadir.",
 )
 
@@ -80,11 +80,11 @@ flags.DEFINE_integer(
 
 flags.DEFINE_boolean('clean', True, 'remove the files which created by last training')
 
-flags.DEFINE_bool("do_train", False, "Whether to run training.")
+flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.100.230.218:8470' ,
+    "tpu_name",'grpc://10.100.85.202:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -101,17 +101,17 @@ tf.flags.DEFINE_string(
     "specified, we will attempt to automatically detect the GCE project from "
     "metadata.")
 
-flags.DEFINE_bool("do_eval",False, "Whether to run eval on the dev set.")
+flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
-flags.DEFINE_bool("do_predict",True, "Whether to run the model in inference mode on the test set.")
+flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 64, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
 
 flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
 
 flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
-flags.DEFINE_float("learning_rate", 5e-5, "The initial learning rate for Adam.")
+flags.DEFINE_float("learning_rate", 5e-3, "The initial learning rate for Adam.")
 
 flags.DEFINE_float("num_train_epochs", 10.0, "Total number of training epochs to perform.")
 flags.DEFINE_float('droupout_rate', 0.5, 'Dropout rate')
@@ -220,30 +220,33 @@ class UlandProcessor(DataProcessor):
     def get_train_examples(self, data_dir):
         """See base class."""
         print('PATH', os.path.join(data_dir, 'train.tsv'))
-        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'train.tsv'))
-        num_yes=sum([1 if y=='1' else 0 for y in Y])
+        X1 = []
+        X2 = []
+        df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        for i in df.index:
+            # y.append(str(int(df['label'][i])))
+            X1.append(str(df['q1'][i]) + ' [CLS] ' + str(df['entity1'][i]))
+            X2.append(str(df['q2'][i]) + ' [SEP] ' + str(df['entity2'][i]))
+        # num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
-        print('NUM Yes: ', num_yes)
+        # print('NUM Yes: ', num_yes)
         print("------------------------------------------------")
         examples = []
         for i in range(len(X1)):
-            # print(i)
             # if i == 0:
             #     continue
-            guid = "train-%d" % (i)
+            guid = "test-%d" % (i)
             if not isinstance(X1[i], str):
                 continue
-            try:
-                text1 = tokenization.convert_to_unicode(X1[i])
-                text2 = tokenization.convert_to_unicode(X2[i])
-                label = tokenization.convert_to_unicode(Y[i])
+            text1 = tokenization.convert_to_unicode(X1[i])
+            text2 = tokenization.convert_to_unicode(X2[i])
+            # label = tokenization.convert_to_unicode(Y[i])
             # en1=tokenization.convert_to_unicode(EN1[i])
             # en2=tokenization.convert_to_unicode(EN2[i])
-                examples.append(
-                        InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
-            except:
-                pass
+            examples.append(
+                InputExample(guid=guid, text_a=text1, text_b=text2))
         return examples
+
     def get_test_examples(self, data_dir):
         """See base class."""
         # (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'test.tsv'))
@@ -276,25 +279,31 @@ class UlandProcessor(DataProcessor):
 
     def get_dev_examples(self, data_dir):
         """See base class."""
-        (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'dev.tsv'))
-        num_yes=sum([1 if y=='1' else 0 for y in Y])
+        X1 = []
+        X2 = []
+        df = pd.read_csv(os.path.join(data_dir, 'dev.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        for i in df.index:
+            # y.append(str(int(df['label'][i])))
+            X1.append(str(df['q1'][i]) + ' [CLS] ' + str(df['entity1'][i]))
+            X2.append(str(df['q2'][i]) + ' [SEP] ' + str(df['entity2'][i]))
+        # num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
-        print('NUM Yes: ', num_yes)
+        # print('NUM Yes: ', num_yes)
         print("------------------------------------------------")
         examples = []
         for i in range(len(X1)):
             # if i == 0:
             #     continue
-            guid = "dev-%d" % (i)
+            guid = "test-%d" % (i)
             if not isinstance(X1[i], str):
                 continue
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
-            label = tokenization.convert_to_unicode(Y[i])
+            # label = tokenization.convert_to_unicode(Y[i])
             # en1=tokenization.convert_to_unicode(EN1[i])
             # en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2, label=label))
+                InputExample(guid=guid, text_a=text1, text_b=text2))
         return examples
 
     def get_labels(self):
@@ -888,13 +897,13 @@ def main(_):
     assert num_written_lines == num_actual_predict_examples
 
 
-# if __name__ == "__main__":
-#   flags.mark_flag_as_required("data_dir")
-#   flags.mark_flag_as_required("task_name")
-#   flags.mark_flag_as_required("vocab_file")
-#   flags.mark_flag_as_required("bert_config_file")
-#   flags.mark_flag_as_required("output_dir")
-#   tf.app.run()
+if __name__ == "__main__":
+  flags.mark_flag_as_required("data_dir")
+  flags.mark_flag_as_required("task_name")
+  flags.mark_flag_as_required("vocab_file")
+  flags.mark_flag_as_required("bert_config_file")
+  flags.mark_flag_as_required("output_dir")
+  tf.app.run()
 
 import re
 class Bert_classifi(object):
@@ -1074,30 +1083,30 @@ class Bert_classifi(object):
         else:
             print(self.predict_raw_sentence(text1,text2))
 
-classifi=Bert_classifi()
+# classifi=Bert_classifi()
 # classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
 #               'en Typically, each language will have a corresponding reader')
 # print(classifi.predict_raw_sentence('How does the Surface Pro himself 4 compare with iPad Pro?','Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?')[0])
-i=0
-directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti')
-for file in os.listdir(directory):
-  print(i)
-  filename = os.fsdecode(file)
-  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti',filename)
-  data={'test_id':[],'is_duplicate':[]}
-  df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
-  for index in df.index:
-    try:
-        label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
-                                            # +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
-        # print(label)
-        data['is_duplicate'].append(int(label))
-        data['test_id'].append(df['test_id'][index])
-    except:
-        data['is_duplicate'].append(0)
-        data['test_id'].append(df['test_id'][index])
-        pass
-  data=pd.DataFrame(data)
-  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/'+str(i)+'.csv',index=False,sep=',')
-  print(filename)
-  i+=1
+# i=0
+# directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti')
+# for file in os.listdir(directory):
+#   print(i)
+#   filename = os.fsdecode(file)
+#   filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti',filename)
+#   data={'test_id':[],'is_duplicate':[]}
+#   df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
+#   for index in df.index:
+#     try:
+#         label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
+#                                             +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
+#         print(label)
+        # data['is_duplicate'].append(int(label))
+        # data['test_id'].append(df['test_id'][index])
+    # except:
+    #     data['is_duplicate'].append(0)
+    #     data['test_id'].append(df['test_id'][index])
+    #     pass
+  # data=pd.DataFrame(data)
+  # data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/'+str(i)+'.csv',index=False,sep=',')
+  # print(filename)
+  # i+=1
