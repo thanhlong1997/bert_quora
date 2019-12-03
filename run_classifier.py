@@ -222,14 +222,15 @@ class UlandProcessor(DataProcessor):
         print('PATH', os.path.join(data_dir, 'train.tsv'))
         X1 = []
         X2 = []
+        Y=[]
         df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            # y.append(str(int(df['label'][i])))
+            Y.append(str(int(df['label'][i])))
             X1.append(str(df['q1'][i]) + ' [CLS] ' + str(df['entity1'][i]))
             X2.append(str(df['q2'][i]) + ' [SEP] ' + str(df['entity2'][i]))
-        # num_yes=sum([1 if y=='1' else 0 for y in Y])
+        num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
-        # print('NUM Yes: ', num_yes)
+        print('NUM Yes: ', num_yes)
         print("------------------------------------------------")
         examples = []
         for i in range(len(X1)):
@@ -240,11 +241,11 @@ class UlandProcessor(DataProcessor):
                 continue
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
-            # label = tokenization.convert_to_unicode(Y[i])
+            label = tokenization.convert_to_unicode(Y[i])
             # en1=tokenization.convert_to_unicode(EN1[i])
             # en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                InputExample(guid=guid, text_a=text1, text_b=text2))
+                InputExample(guid=guid, text_a=text1, text_b=text2,labels=label))
         return examples
 
     def get_test_examples(self, data_dir):
@@ -252,14 +253,15 @@ class UlandProcessor(DataProcessor):
         # (X1,X2, Y) = self._read_csv(os.path.join(data_dir,'test.tsv'))
         X1=[]
         X2=[]
+        Y=[]
         df = pd.read_csv(os.path.join(data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            # y.append(str(int(df['label'][i])))
+            Y.append(str(int(df['label'][i])))
             X1.append(str(df['q1'][i])+' [CLS] '+str(df['entity1'][i]))
             X2.append(str(df['q2'][i])+' [SEP] '+str(df['entity2'][i]))
-        # num_yes=sum([1 if y=='1' else 0 for y in Y])
+        num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
-        # print('NUM Yes: ', num_yes)
+        print('NUM Yes: ', num_yes)
         print("------------------------------------------------")
         examples = []
         for i in range(len(X1)):
@@ -270,25 +272,26 @@ class UlandProcessor(DataProcessor):
                 continue
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
-            # label = tokenization.convert_to_unicode(Y[i])
+            label = tokenization.convert_to_unicode(Y[i])
             # en1=tokenization.convert_to_unicode(EN1[i])
             # en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                    InputExample(guid=guid, text_a=text1,text_b=text2))
+                    InputExample(guid=guid, text_a=text1,text_b=text2,labels=label))
         return examples
 
     def get_dev_examples(self, data_dir):
         """See base class."""
         X1 = []
         X2 = []
+        Y=[]
         df = pd.read_csv(os.path.join(data_dir, 'dev.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            # y.append(str(int(df['label'][i])))
+            Y.append(str(int(df['label'][i])))
             X1.append(str(df['q1'][i]) + ' [CLS] ' + str(df['entity1'][i]))
             X2.append(str(df['q2'][i]) + ' [SEP] ' + str(df['entity2'][i]))
-        # num_yes=sum([1 if y=='1' else 0 for y in Y])
+        num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
-        # print('NUM Yes: ', num_yes)
+        print('NUM Yes: ', num_yes)
         print("------------------------------------------------")
         examples = []
         for i in range(len(X1)):
@@ -299,11 +302,11 @@ class UlandProcessor(DataProcessor):
                 continue
             text1 = tokenization.convert_to_unicode(X1[i])
             text2 = tokenization.convert_to_unicode(X2[i])
-            # label = tokenization.convert_to_unicode(Y[i])
+            label = tokenization.convert_to_unicode(Y[i])
             # en1=tokenization.convert_to_unicode(EN1[i])
             # en2=tokenization.convert_to_unicode(EN2[i])
             examples.append(
-                InputExample(guid=guid, text_a=text1, text_b=text2))
+                InputExample(guid=guid, text_a=text1, text_b=text2,labels=label))
         return examples
 
     def get_labels(self):
