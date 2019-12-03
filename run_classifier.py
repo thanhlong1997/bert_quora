@@ -141,7 +141,7 @@ flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
 
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
-  def __init__(self, guid, text_a, text_b=None, label=None,entity1=None,entity2=None):
+  def __init__(self, guid, text_a, text_b=None, labels=None,entity1=None,entity2=None):
     """Constructs a InputExample.
     Args:
       guid: Unique id for the example.
@@ -155,7 +155,7 @@ class InputExample(object):
     self.guid = guid
     self.text_a = text_a
     self.text_b = text_b
-    self.labels = label
+    self.labels = labels
     # self.entity1=entity1
     # self.entity2=entity2
 
