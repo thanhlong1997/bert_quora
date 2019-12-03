@@ -141,7 +141,7 @@ flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
 
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
-  def __init__(self, guid, text_a, text_b=None, labels=None,entity1=None,entity2=None):
+  def __init__(self, guid, text_a, text_b, labels,entity1=None,entity2=None):
     """Constructs a InputExample.
     Args:
       guid: Unique id for the example.
@@ -166,12 +166,12 @@ class InputFeatures(object):
                input_ids,
                input_mask,
                segment_ids,
-               label_id,
+               label_ids,
                is_real_example=True):
     self.input_ids = input_ids
     self.input_mask = input_mask
     self.segment_ids = segment_ids
-    self.label_id = label_id
+    self.label_ids = label_ids
     self.is_real_example = is_real_example
 
 
@@ -329,21 +329,18 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   label_map = {}
   for (i, label) in enumerate(label_list):
     label_map[label] = i
+  with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
+      pickle.dump(label_map, w)
 
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = None
   if example.text_b:
     tokens_b = tokenizer.tokenize(example.text_b)
 
-  if tokens_b:
-    # Modifies `tokens_a` and `tokens_b` in place so that the total
-    # length is less than the specified length.
-    # Account for [CLS], [SEP], [SEP] with "- 3"
-    _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
-  else:
-    # Account for [CLS] and [SEP] with "- 2"
-    if len(tokens_a) > max_seq_length - 2:
-      tokens_a = tokens_a[0:(max_seq_length - 2)]
+  if len(tokens_a) > int(max_seq_length / 2 - 1):
+      tokens_a = tokens_a[0:int(max_seq_length / 2 - 1)]
+  if len(tokens_b) > int(max_seq_length / 2 - 1):
+      tokens_b = tokens_b[0:int(max_seq_length / 2 - 1)]
 
   # The convention in BERT is:
   # (a) For sequence pairs:
@@ -396,7 +393,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   assert len(input_mask) == max_seq_length
   assert len(segment_ids) == max_seq_length
 
-  label_id = label_map[example.labels]
+  label_ids = label_map[example.labels]
   if ex_index < 5:
     tf.logging.info("*** Example ***")
     tf.logging.info("guid: %s" % (example.guid))
@@ -411,7 +408,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
       input_ids=input_ids,
       input_mask=input_mask,
       segment_ids=segment_ids,
-      label_id=label_id,
+      label_ids=label_ids,
       is_real_example=True)
   return feature
 
@@ -436,7 +433,7 @@ def file_based_convert_examples_to_features(
     features["input_ids"] = create_int_feature(feature.input_ids)
     features["input_mask"] = create_int_feature(feature.input_mask)
     features["segment_ids"] = create_int_feature(feature.segment_ids)
-    features["label_ids"] = create_int_feature([feature.label_id])
+    features["label_ids"] = create_int_feature([feature.label_ids])
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
     writer.write(tf_example.SerializeToString())
