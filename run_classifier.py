@@ -155,7 +155,7 @@ class InputExample(object):
     self.guid = guid
     self.text_a = text_a
     self.text_b = text_b
-    self.label = label
+    self.labels = label
     # self.entity1=entity1
     # self.entity2=entity2
 
