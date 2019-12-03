@@ -58,7 +58,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/quora',
+    "output_dir",'gs://test_bucket_share_1/model_trained/add_feature_new_312',
     "The output directory where the model checkpoints will be written."
 )
 
