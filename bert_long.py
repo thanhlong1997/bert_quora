@@ -289,9 +289,9 @@ class DataProcessor(object):
     X2 = []
     df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
     for i in df.index:
-        y.append(str(int(df['label'][i])))
-        X1.append(str(df['q1'][i]))
-        X2.append(str(df['q2'][i]))
+        y.append(str(int(df['is_duplicate'][i])))
+        X1.append(str(df['question1'][i]))
+        X2.append(str(df['question2'][i]))
 
     return (X1, X2, y)
 
