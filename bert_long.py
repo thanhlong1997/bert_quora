@@ -37,23 +37,25 @@ flags = tf.flags
 FLAGS = flags.FLAGS
 
 ## Required parameters
-if os.name == 'nt':
-    bert_path = 'D:\\Research\\multi_cased_L-12_H-768_A-12'
-    root_path = r'D:/Research/Bert_Ner'
-else:
-    # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
-    # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-    bert_path = '/home/nissay/Levi/bert/model_trained/multi_cased_L-12_H-768_A-12'
-    root_path = '/home/nissay/Levi/bert'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+base='./bert_quora'
+## Required parameters
+# if os.name == 'nt':
+#     bert_path = 'D:\\Research\\multi_cased_L-12_H-768_A-12'
+#     root_path = r'D:/Research/Bert_Ner'
+# else:
+#     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
+#     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
+bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
+project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
+root_path = base
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(root_path, 'model_trained/data'),
+    "data_dir", os.path.join(project_path, 'data_train_new'),
     "The input datadir.",
 )
 
 flags.DEFINE_string(
-    "test_dir", '/home/nissay/prj_nissay/kepco_data/testing',
+    "test_dir", os.path.join(project_path, 'data_test_new'),
     "The input datadir.",
 )
 
@@ -67,7 +69,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir", 'model_trained/intent',
+    "output_dir",'gs://test_bucket_share_1/model_trained/new_model_312',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -83,7 +85,7 @@ flags.DEFINE_bool(
 )
 
 flags.DEFINE_integer(
-    "max_seq_length", 384,
+    "max_seq_length", 512,
     "The maximum total input sequence length after WordPiece tokenization."
 )
 
@@ -91,13 +93,25 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 
-flags.DEFINE_string('tpu_name','demo-tpu','name of tpu')
+tf.flags.DEFINE_string(
+    "tpu_name",'grpc://10.100.85.202:8470' ,
+    "The Cloud TPU to use for training. This should be either the name "
+    "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
+    "url.")
 
-flags.DEFINE_string('tpu_zone','us-central1-c','zone of tpu')
+tf.flags.DEFINE_string(
+    "tpu_zone", None,
+    "[Optional] GCE zone where the Cloud TPU is located in. If not "
+    "specified, we will attempt to automatically detect the GCE project from "
+    "metadata.")
 
-flags.DEFINE_string('gcp_project',None,'sth')
+tf.flags.DEFINE_string(
+    "gcp_project", None,
+    "[Optional] Project name for the Cloud TPU-enabled project. If not "
+    "specified, we will attempt to automatically detect the GCE project from "
+    "metadata.")
 
 flags.DEFINE_bool("do_eval", True, "Whether to run eval on the dev set.")
 
@@ -111,7 +125,7 @@ flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-3, "The initial learning rate for Adam.")
 
-flags.DEFINE_float("num_train_epochs", 300.0, "Total number of training epochs to perform.")
+flags.DEFINE_float("num_train_epochs", 50.0, "Total number of training epochs to perform.")
 flags.DEFINE_float('droupout_rate', 0.5, 'Dropout rate')
 flags.DEFINE_float('clip', 5, 'Gradient clip')
 flags.DEFINE_float(
@@ -139,82 +153,82 @@ flags.DEFINE_string('data_config_path', os.path.join(root_path, 'data.conf'),
 # from bert_classification import ai_const_production as ai_const
 import glob
 import json
-import unidecode
+# import unidecode
 
 
-def get_data_dictionary_from_excel_linhlt(excel_file):
-    print("READING_FILE", excel_file)
-    xl = pd.ExcelFile(excel_file)
-    df = xl.parse('SE result')
-    df.dropna(subset=["Sentence"], inplace=True)
-    folder1s = df["Folder1"].values
-    folder2s = df["Folder2"].values
-    files = df["File"].values
-    tags = df["Tag"].values
-    tags = [unicodedata.normalize('NFKC', re.sub('＊|\*|\s+', '', x)).lower() if type(x) == str else x for x in tags]
-    # tags = [re.sub('\s+','',x) for x in tags]
-    is_titles = df["Is_title"].values
-    is_tables = df["Is_table"].values
-    values = df["Value"].values
-    sentences = df["Sentence"].values
-    all_titles = df["Titles"].values
-    is_tag11_done=False
-    for i, x in enumerate(all_titles):
-        try:
-            if type(x)==str:
-                x = re.sub(',\s*\]', ']', x)
-                x = re.sub(';\"', '\"', x)
-                x = re.sub(',\"\s*\"','","',x)
-                x = re.sub(',\s*,', ',', x)
+# def get_data_dictionary_from_excel_linhlt(excel_file):
+#     print("READING_FILE", excel_file)
+#     xl = pd.ExcelFile(excel_file)
+#     df = xl.parse('SE result')
+#     df.dropna(subset=["Sentence"], inplace=True)
+#     folder1s = df["Folder1"].values
+#     folder2s = df["Folder2"].values
+#     files = df["File"].values
+#     tags = df["Tag"].values
+#     tags = [unicodedata.normalize('NFKC', re.sub('＊|\*|\s+', '', x)).lower() if type(x) == str else x for x in tags]
+#     # tags = [re.sub('\s+','',x) for x in tags]
+#     is_titles = df["Is_title"].values
+#     is_tables = df["Is_table"].values
+#     values = df["Value"].values
+#     sentences = df["Sentence"].values
+#     all_titles = df["Titles"].values
+#     is_tag11_done=False
+#     for i, x in enumerate(all_titles):
+#         try:
+#             if type(x)==str:
+#                 x = re.sub(',\s*\]', ']', x)
+#                 x = re.sub(';\"', '\"', x)
+#                 x = re.sub(',\"\s*\"','","',x)
+#                 x = re.sub(',\s*,', ',', x)
+#
+#                 all_titles[i] = json.loads(x, strict=False)
+#             else:
+#                 all_titles[i] =[]
+#         except Exception:
+#             # all_titles[i] = []
+#             print("line_err", i, x)
+#             raise
+#     X_sent=[]
+#     X_title=[]
+#     Y=[]
+#     for i, sentence in enumerate(sentences):
+#         # print("LINE_NUMBER",i)
+#         # if i == 16 or i == 17:
+#         #     print("DEBUG")
+#         titles = all_titles[i]
+#         current_tags = tags[i].split(';') if type(tags[i]) == str else []
+#         current_tags = [x for x in current_tags if len(re.sub('\s+', '', x)) > 0]
+#         # current_in_tags = [x for x in current_tags if x in ai_const.all_tags]
+#         # current_not_in_tags= [x for x in current_tags if x not in current_in_tags]
+#         # current_not_in_tags= random.sample( current_not_in_tags, 2* len(current_in_tags))
+#         # current_tags= current_in_tags+ current_not_in_tags
+#         if len(current_tags)==0:
+#             continue
+#         # curr_sentence="".join(titles)+sentence
+#         X_sent.append(sentence)
+#         if len(titles)>0:
+#             X_title.append("".join(titles))
+#         else:
+#             X_title.append(sentence)
+#         Y.append(current_tags)
+#     print("LEN TRAINING: ", len(X_sent))
+#     return X_sent, X_title, Y
 
-                all_titles[i] = json.loads(x, strict=False)
-            else:
-                all_titles[i] =[]
-        except Exception:
-            # all_titles[i] = []
-            print("line_err", i, x)
-            raise
-    X_sent=[]
-    X_title=[]
-    Y=[]
-    for i, sentence in enumerate(sentences):
-        # print("LINE_NUMBER",i)
-        # if i == 16 or i == 17:
-        #     print("DEBUG")
-        titles = all_titles[i]
-        current_tags = tags[i].split(';') if type(tags[i]) == str else []
-        current_tags = [x for x in current_tags if len(re.sub('\s+', '', x)) > 0]
-        # current_in_tags = [x for x in current_tags if x in ai_const.all_tags]
-        # current_not_in_tags= [x for x in current_tags if x not in current_in_tags]
-        # current_not_in_tags= random.sample( current_not_in_tags, 2* len(current_in_tags))
-        # current_tags= current_in_tags+ current_not_in_tags
-        if len(current_tags)==0:
-            continue
-        # curr_sentence="".join(titles)+sentence
-        X_sent.append(sentence)
-        if len(titles)>0:
-            X_title.append("".join(titles))
-        else:
-            X_title.append(sentence)
-        Y.append(current_tags)
-    print("LEN TRAINING: ", len(X_sent))
-    return X_sent, X_title, Y
-
-def get_data_dictionary_from_folder_linhlt(excel_folder):
-    X_sent=[]
-    X_title=[]
-    Y=[]
-    excel_file_paths = glob.glob(excel_folder + '/**/*.xlsx', recursive=True)
-    for i,excel_file in enumerate(excel_file_paths):
-        if '.xlsx.xlsx' not in excel_file:
-            try:
-                x_sent, x_title, y=get_data_dictionary_from_excel_linhlt(excel_file)
-                X_sent.extend(x_sent)
-                X_title.extend(x_title)
-                Y.extend(y)
-            except:
-                print('ERROR FILE: ', excel_file)
-    return X_sent, X_title, Y
+# def get_data_dictionary_from_folder_linhlt(excel_folder):
+#     X_sent=[]
+#     X_title=[]
+#     Y=[]
+#     excel_file_paths = glob.glob(excel_folder + '/**/*.xlsx', recursive=True)
+#     for i,excel_file in enumerate(excel_file_paths):
+#         if '.xlsx.xlsx' not in excel_file:
+#             try:
+#                 x_sent, x_title, y=get_data_dictionary_from_excel_linhlt(excel_file)
+#                 X_sent.extend(x_sent)
+#                 X_title.extend(x_title)
+#                 Y.extend(y)
+#             except:
+#                 print('ERROR FILE: ', excel_file)
+#     return X_sent, X_title, Y
 
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
@@ -270,40 +284,19 @@ class DataProcessor(object):
   @classmethod
   def _read_csv(cls, data_dir):
     """Reads a tab separated value file."""
+    y = []
     X1 = []
     X2 = []
-    y = []
-    with open(data_dir, 'r', encoding='utf-8') as file:
-        data = file.read().splitlines()
-        for item in data:
-            while re.search('  ', item):
-                item = re.sub('  ', ' ', item)
-            x_1 = ''
-            x_2 = ''
-            for index in range(len(item.split(' '))):
-                # print(' sds', item.split(' ')[index])
-                if item.split(' ')[index] == 'vi':
-                    for i in range(index+1, len(item.split(' '))):
-                        if item.split(' ')[i] == 'en':
-                            break
-                        else:
-                            x_1 += item.split(' ')[i] + ' '
-                if item.split(' ')[index] == 'en':
-                    for i in range(index+1, len(item.split(' '))):
-                        x_2 += item.split(' ')[i] + ' '
-                    break
-            X1.append(x_1)
-            X2.append(x_2)
-            if re.search('__label__true', item):
-                y.append('true')
-            else:
-                y.append('false')
+    df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
+    for i in df.index:
+        y.append(str(int(df['label'][i])))
+        X1.append(str(df['q1'][i]))
+        X2.append(str(df['q2'][i]))
 
-        file.close()
-    return (X1,X2,y)
+    return (X1, X2, y)
 
-  def read_kepco_multilabel(self,excel_folder):
-      return get_data_dictionary_from_folder_linhlt(excel_folder)
+  # def read_kepco_multilabel(self,excel_folder):
+  #     return get_data_dictionary_from_folder_linhlt(excel_folder)
 
 
 
@@ -315,7 +308,7 @@ class UlandProcessor(DataProcessor):
 
     def get_train_examples(self, data_dir):
         """See base class."""
-        (X_sent,X_title, Y) = self._read_csv(os.path.join(data_dir,'train.txt'))
+        (X_sent,X_title, Y) = self._read_csv(os.path.join(data_dir,'train.tsv'))
         # Y=[[tag for tag in y if tag in ai_const.all_tags] for y in Y]
         # print('LEN NO TAG: ', )
         examples = []
@@ -334,7 +327,7 @@ class UlandProcessor(DataProcessor):
 
     def get_test_examples(self, data_dir):
         """See base class."""
-        (X1, X2, Y) = self._read_csv(os.path.join(data_dir, 'test.txt'))
+        (X1, X2, Y) = self._read_csv(os.path.join(data_dir, 'test.tsv'))
         num_yes = sum([1 if y == 'true' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -355,7 +348,7 @@ class UlandProcessor(DataProcessor):
 
     def get_dev_examples(self, data_dir):
         """See base class."""
-        (X1, X2, Y) = self._read_csv(os.path.join(data_dir, 'dev.txt'))
+        (X1, X2, Y) = self._read_csv(os.path.join(data_dir, 'dev.tsv'))
         num_yes = sum([1 if y == 'true' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -380,7 +373,7 @@ class UlandProcessor(DataProcessor):
 
     def get_labels(self):
         # return [label.lower() for label in  ai_const.all_tags]
-        return ['true', 'false']
+        return ['1', '0']
 
 def convert_to_k_hot(labels, num_labels):
     # print("NUM LABEL: ", num_labels)
@@ -1152,5 +1145,5 @@ class BertMultilabelClassifier(object):
 def run():
     main()
     cls= BertMultilabelClassifier()
-    cls.test(FLAGS.data_dir)
+    cls.test(FLAGS.test_dir)
 run()
