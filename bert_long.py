@@ -288,6 +288,7 @@ class DataProcessor(object):
     y = []
     X1 = []
     X2 = []
+    print(data_dir)
     df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
     for i in df.index:
         try:
@@ -314,6 +315,7 @@ class UlandProcessor(DataProcessor):
         (X_sent,X_title, Y) = self._read_csv(os.path.join(data_dir,'train.tsv'))
         # Y=[[tag for tag in y if tag in ai_const.all_tags] for y in Y]
         # print('LEN NO TAG: ', )
+        print(len(X_sent))
         examples = []
         for i in range(len(X_sent)):
             # if i == 0:
