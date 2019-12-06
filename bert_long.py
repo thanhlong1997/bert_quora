@@ -291,6 +291,7 @@ class DataProcessor(object):
     print(data_dir)
     df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
     for i in df.index:
+        print(i)
         try:
             y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
@@ -315,6 +316,9 @@ class UlandProcessor(DataProcessor):
         (X_sent,X_title, Y) = self._read_csv(os.path.join(data_dir,'train.tsv'))
         # Y=[[tag for tag in y if tag in ai_const.all_tags] for y in Y]
         # print('LEN NO TAG: ', )
+        num_yes = sum([1 if y == '0' else 0 for y in Y])
+        print("------------------------------------------------")
+        print('NUM Yes: ', num_yes)
         print(len(X_sent))
         examples = []
         for i in range(len(X_sent)):
@@ -852,14 +856,15 @@ def main():
         "was only trained up to sequence length %d" %
         (FLAGS.max_seq_length, bert_config.max_position_embeddings))
 
-
-
+  tf.gfile.MakeDirs(FLAGS.output_dir)
   task_name = FLAGS.task_name.lower()
 
   if task_name not in processors:
     raise ValueError("Task not found: %s" % (task_name))
 
+  processor = processors[task_name]()
 
+  label_list = processor.get_labels()
 
   tokenizer = tokenization.FullTokenizer(
       vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
