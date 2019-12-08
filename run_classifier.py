@@ -224,7 +224,7 @@ class UlandProcessor(DataProcessor):
         Y=[]
         df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            y.append(str(int(df['is_duplicate'][i])))
+            Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
             X2.append(str(df['question2'][i]))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
@@ -255,7 +255,7 @@ class UlandProcessor(DataProcessor):
         Y=[]
         df = pd.read_csv(os.path.join(data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            y.append(str(int(df['is_duplicate'][i])))
+            Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
             X2.append(str(df['question2'][i]))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
@@ -328,23 +328,21 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   label_map = {}
   for (i, label) in enumerate(label_list):
     label_map[label] = i
-  with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
-      pickle.dump(label_map, w)
 
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = None
   if example.text_b:
-      tokens_b = tokenizer.tokenize(example.text_b)
+    tokens_b = tokenizer.tokenize(example.text_b)
 
   if tokens_b:
-      # Modifies `tokens_a` and `tokens_b` in place so that the total
-      # length is less than the specified length.
-      # Account for [CLS], [SEP], [SEP] with "- 3"
-      _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
+    # Modifies `tokens_a` and `tokens_b` in place so that the total
+    # length is less than the specified length.
+    # Account for [CLS], [SEP], [SEP] with "- 3"
+    _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
   else:
-      # Account for [CLS] and [SEP] with "- 2"
-      if len(tokens_a) > max_seq_length - 2:
-          tokens_a = tokens_a[0:(max_seq_length - 2)]
+    # Account for [CLS] and [SEP] with "- 2"
+    if len(tokens_a) > max_seq_length - 2:
+      tokens_a = tokens_a[0:(max_seq_length - 2)]
 
   # The convention in BERT is:
   # (a) For sequence pairs:
@@ -397,7 +395,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   assert len(input_mask) == max_seq_length
   assert len(segment_ids) == max_seq_length
 
-  label_ids = label_map[example.labels]
+  label_id = label_map[example.label]
   if ex_index < 5:
     tf.logging.info("*** Example ***")
     tf.logging.info("guid: %s" % (example.guid))
@@ -406,15 +404,16 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     tf.logging.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
     tf.logging.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
     tf.logging.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
-    tf.logging.info("label: %s (id = %d)" % (example.labels, label_ids))
+    tf.logging.info("label: %s (id = %d)" % (example.label, label_id))
 
   feature = InputFeatures(
       input_ids=input_ids,
       input_mask=input_mask,
       segment_ids=segment_ids,
-      label_ids=label_ids,
+      label_id=label_id,
       is_real_example=True)
   return feature
+
 
 def file_based_convert_examples_to_features(
     examples, label_list, max_seq_length, tokenizer, output_file):
@@ -430,17 +429,20 @@ def file_based_convert_examples_to_features(
                                      max_seq_length, tokenizer)
 
     def create_int_feature(values):
-        f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
-        return f
+      f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+      return f
 
     features = collections.OrderedDict()
     features["input_ids"] = create_int_feature(feature.input_ids)
     features["input_mask"] = create_int_feature(feature.input_mask)
     features["segment_ids"] = create_int_feature(feature.segment_ids)
-    features["label_ids"] = create_int_feature([feature.label_ids])
+    features["label_ids"] = create_int_feature([feature.label_id])
+    features["is_real_example"] = create_int_feature(
+        [int(feature.is_real_example)])
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
     writer.write(tf_example.SerializeToString())
+  writer.close()
 
 
 def file_based_input_fn_builder(input_file, seq_length, is_training,
@@ -450,9 +452,10 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
   name_to_features = {
       "input_ids": tf.FixedLenFeature([seq_length], tf.int64),
       "input_mask": tf.FixedLenFeature([seq_length], tf.int64),
-      "segment_ids": tf.FixedLenFeature([seq_length], tf.int64),}
-      # "label_ids": tf.FixedLenFeature([], tf.int64),
-
+      "segment_ids": tf.FixedLenFeature([seq_length], tf.int64),
+      "label_ids": tf.FixedLenFeature([], tf.int64),
+      "is_real_example": tf.FixedLenFeature([], tf.int64),
+  }
 
   def _decode_record(record, name_to_features):
     """Decodes a record to a TensorFlow example."""
@@ -546,9 +549,9 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
 
     one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
 
-    per_example_loss = tf.nn.softmax_cross_entropy_with_logits(labels=one_hot_labels, logits=logits)
+    per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
     loss = tf.reduce_mean(per_example_loss)
-    tf.Print(loss, [loss], message='loss')
+
     return (loss, per_example_loss, logits, probabilities)
 
 
@@ -568,6 +571,11 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
     input_mask = features["input_mask"]
     segment_ids = features["segment_ids"]
     label_ids = features["label_ids"]
+    is_real_example = None
+    if "is_real_example" in features:
+      is_real_example = tf.cast(features["is_real_example"], dtype=tf.float32)
+    else:
+      is_real_example = tf.ones(tf.shape(label_ids), dtype=tf.float32)
 
     is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
@@ -612,16 +620,18 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
           scaffold_fn=scaffold_fn)
     elif mode == tf.estimator.ModeKeys.EVAL:
 
-      def metric_fn(per_example_loss, label_ids, logits):
+      def metric_fn(per_example_loss, label_ids, logits, is_real_example):
         predictions = tf.argmax(logits, axis=-1, output_type=tf.int32)
-        accuracy = tf.metrics.accuracy(label_ids, predictions)
-        loss = tf.metrics.mean(per_example_loss)
+        accuracy = tf.metrics.accuracy(
+            labels=label_ids, predictions=predictions, weights=is_real_example)
+        loss = tf.metrics.mean(values=per_example_loss, weights=is_real_example)
         return {
             "eval_accuracy": accuracy,
             "eval_loss": loss,
         }
 
-      eval_metrics = (metric_fn, [per_example_loss, label_ids, logits])
+      eval_metrics = (metric_fn,
+                      [per_example_loss, label_ids, logits, is_real_example])
       output_spec = tf.contrib.tpu.TPUEstimatorSpec(
           mode=mode,
           loss=total_loss,
@@ -629,7 +639,9 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
           scaffold_fn=scaffold_fn)
     else:
       output_spec = tf.contrib.tpu.TPUEstimatorSpec(
-          mode=mode, predictions=probabilities, scaffold_fn=scaffold_fn)
+          mode=mode,
+          predictions={"probabilities": probabilities},
+          scaffold_fn=scaffold_fn)
     return output_spec
 
   return model_fn
@@ -706,11 +718,12 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
     features.append(feature)
   return features
 
+
 def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
 
   processors = {
-       "uland": UlandProcessor,
+      "uland": UlandProcessor,
   }
 
   tokenization.validate_case_matches_checkpoint(FLAGS.do_lower_case,
@@ -806,14 +819,14 @@ def main(_):
     eval_examples = processor.get_dev_examples(FLAGS.data_dir)
     num_actual_eval_examples = len(eval_examples)
     if FLAGS.use_tpu:
+      pass
       # TPU requires a fixed batch size for all batches, therefore the number
       # of examples must be a multiple of the batch size, or else examples
       # will get dropped. So we pad with fake examples which are ignored
       # later on. These do NOT count towards the metric (all tf.metrics
       # support a per-instance weight, and these get a weight of 0.0).
-      while len(eval_examples) % FLAGS.eval_batch_size != 0:
-        # eval_examples.append(PaddingInputExample())
-        pass
+      # while len(eval_examples) % FLAGS.eval_batch_size != 0:
+      #   eval_examples.append(PaddingInputExample())
 
     eval_file = os.path.join(FLAGS.output_dir, "eval.tf_record")
     file_based_convert_examples_to_features(
@@ -850,21 +863,19 @@ def main(_):
         writer.write("%s = %s\n" % (key, str(result[key])))
 
   if FLAGS.do_predict:
-    # with open(FLAGS.output_dir + '/label2id.pkl', 'rb') as rf:
-          # label2id = pickle.load(rf)
-          # id2label = {value: key for key, value in label2id.items()}
     predict_examples = processor.get_test_examples(FLAGS.data_dir)
     num_actual_predict_examples = len(predict_examples)
     if FLAGS.use_tpu:
+      pass
       # TPU requires a fixed batch size for all batches, therefore the number
       # of examples must be a multiple of the batch size, or else examples
       # will get dropped. So we pad with fake examples which are ignored
       # later on.
-      while len(predict_examples) % FLAGS.predict_batch_size != 0:
-        predict_examples.append(PaddingInputExample())
+      # while len(predict_examples) % FLAGS.predict_batch_size != 0:
+      #   predict_examples.append(PaddingInputExample())
 
     predict_file = os.path.join(FLAGS.output_dir, "predict.tf_record")
-    file_based_convert_examples_to_features(predict_examples,
+    file_based_convert_examples_to_features(predict_examples, label_list,
                                             FLAGS.max_seq_length, tokenizer,
                                             predict_file)
 
@@ -882,16 +893,13 @@ def main(_):
         drop_remainder=predict_drop_remainder)
 
     result = estimator.predict(input_fn=predict_input_fn)
-    # tf.logging.info('result', enumerate(result))
+
     output_predict_file = os.path.join(FLAGS.output_dir, "test_results.tsv")
     with tf.gfile.GFile(output_predict_file, "w") as writer:
       num_written_lines = 0
       tf.logging.info("***** Predict results *****")
       for (i, prediction) in enumerate(result):
-        # print('prediction_resutl',prediction)
-        # print('index',i)
-        # 1/0
-        probabilities = prediction
+        probabilities = prediction["probabilities"]
         if i >= num_actual_predict_examples:
           break
         output_line = "\t".join(
