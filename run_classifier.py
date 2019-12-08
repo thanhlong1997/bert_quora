@@ -38,16 +38,15 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
+bert_path = './drive/My Drive/AI_COLAB/multi_cased_L-12_H-768_A-12'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
-# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_add_feature'),
+    "data_dir", os.path.join(project_path, 'data_train_new'),
     "The input datadir.",
 )
-
 flags.DEFINE_string(
     "bert_config_file", os.path.join(bert_path, 'bert_config.json'),
     "The config json file corresponding to the pre-trained BERT model."
@@ -58,7 +57,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/add_feature_new_312',
+    "output_dir",'./drive/My Drive/AI_COLAB/model_trained/new_model_812',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -82,7 +81,7 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.100.85.202:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
@@ -204,9 +203,9 @@ class DataProcessor(object):
       # EN2=[]
       df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
       for i in df.index:
-        y.append(str(int(df['label'][i])))
-        X1.append(str(df['q1'][i])+' [CLS] '+str(df['entity1'][i]))
-        X2.append(str(df['q2'][i])+' [SEP] '+str(df['entity2'][i]))
+        y.append(str(int(df['is_duplicate'][i])))
+        X1.append(str(df['question1'][i]))
+        X2.append(str(df['question2'][i]))
               # EN1.append(str(df['entity1']))
               # EN2.append(str(df['entity2']))
           # print('True:',i)
@@ -225,9 +224,9 @@ class UlandProcessor(DataProcessor):
         Y=[]
         df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            Y.append(str(int(df['label'][i])))
-            X1.append(str(df['q1'][i]) + ' [CLS] ' + str(df['entity1'][i]))
-            X2.append(str(df['q2'][i]) + ' [SEP] ' + str(df['entity2'][i]))
+            y.append(str(int(df['is_duplicate'][i])))
+            X1.append(str(df['question1'][i]))
+            X2.append(str(df['question2'][i]))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -256,9 +255,9 @@ class UlandProcessor(DataProcessor):
         Y=[]
         df = pd.read_csv(os.path.join(data_dir,'test.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            Y.append(str(int(df['label'][i])))
-            X1.append(str(df['q1'][i])+' [CLS] '+str(df['entity1'][i]))
-            X2.append(str(df['q2'][i])+' [SEP] '+str(df['entity2'][i]))
+            y.append(str(int(df['is_duplicate'][i])))
+            X1.append(str(df['question1'][i]))
+            X2.append(str(df['question2'][i]))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
