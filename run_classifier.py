@@ -38,10 +38,10 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = './drive/My Drive/AI_COLAB/multi_cased_L-12_H-768_A-12'
+bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
     "data_dir", os.path.join(project_path, 'data_train_new'),
@@ -57,7 +57,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'./drive/My Drive/AI_COLAB/model_trained/new_model_812',
+    "output_dir",'gs://test_bucket_share_1/model_trained/new_model_812',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -81,7 +81,7 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.100.85.202:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
@@ -104,11 +104,11 @@ flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
 flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 4, "Total batch size for training.")
 
-flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
+flags.DEFINE_integer("eval_batch_size", 4, "Total batch size for eval.")
 
-flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
+flags.DEFINE_integer("predict_batch_size", 4, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-3, "The initial learning rate for Adam.")
 
@@ -222,7 +222,7 @@ class UlandProcessor(DataProcessor):
         X1 = []
         X2 = []
         Y=[]
-        df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep=',', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
@@ -328,6 +328,8 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   label_map = {}
   for (i, label) in enumerate(label_list):
     label_map[label] = i
+  with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
+      pickle.dump(label_map, w)
 
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = None
@@ -395,7 +397,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   assert len(input_mask) == max_seq_length
   assert len(segment_ids) == max_seq_length
 
-  label_id = label_map[example.label]
+  label_id = label_map[example.labels]
   if ex_index < 5:
     tf.logging.info("*** Example ***")
     tf.logging.info("guid: %s" % (example.guid))
@@ -404,13 +406,13 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     tf.logging.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
     tf.logging.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
     tf.logging.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
-    tf.logging.info("label: %s (id = %d)" % (example.label, label_id))
+    tf.logging.info("label: %s (id = %d)" % (example.labels, label_id))
 
   feature = InputFeatures(
       input_ids=input_ids,
       input_mask=input_mask,
       segment_ids=segment_ids,
-      label_id=label_id,
+      label_ids=label_id,
       is_real_example=True)
   return feature
 
@@ -436,7 +438,7 @@ def file_based_convert_examples_to_features(
     features["input_ids"] = create_int_feature(feature.input_ids)
     features["input_mask"] = create_int_feature(feature.input_mask)
     features["segment_ids"] = create_int_feature(feature.segment_ids)
-    features["label_ids"] = create_int_feature([feature.label_id])
+    features["label_ids"] = create_int_feature([feature.label_ids])
     features["is_real_example"] = create_int_feature(
         [int(feature.is_real_example)])
 
