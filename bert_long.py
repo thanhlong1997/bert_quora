@@ -45,10 +45,9 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = './drive/My Drive/AI_COLAB/multi_cased_L-12_H-768_A-12'
+bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
     "data_dir", os.path.join(project_path, 'data_train_new'),
@@ -70,7 +69,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'./drive/My Drive/AI_COLAB/model_trained/new_model_312',
+    "output_dir",'./drive/My Drive/AI_COLAB/model_trained/new_model_912',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -94,10 +93,10 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.61.3.106:8470' ,
+    "tpu_name",'grpc://10.82.8.226:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -118,11 +117,11 @@ flags.DEFINE_bool("do_eval", True, "Whether to run eval on the dev set.")
 
 flags.DEFINE_bool("do_predict", True, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 4, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
 
-flags.DEFINE_integer("eval_batch_size", 4, "Total batch size for eval.")
+flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
 
-flags.DEFINE_integer("predict_batch_size", 4, "Total batch size for predict.")
+flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-3, "The initial learning rate for Adam.")
 
@@ -289,7 +288,7 @@ class DataProcessor(object):
     X1 = []
     X2 = []
     print(data_dir)
-    df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False)
+    df = pd.read_csv(data_dir, sep=',', encoding='utf-8', error_bad_lines=False,engine='python')
     for i in df.index:
         print(i)
         try:
@@ -402,8 +401,8 @@ def convert_single_example( example:InputExample, label_list, max_seq_length,
     label_map[label] = i
   # print('LABEL _ LIST: ', label_list)
   # print('LABEL _ MAP : ', label_map)
-  with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
-      pickle.dump(label_map, w)
+  # with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
+      # pickle.dump(label_map, w)
 
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = tokenizer.tokenize(example.text_b)
