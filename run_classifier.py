@@ -57,7 +57,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/new_model_812',
+    "output_dir",'gs://test_bucket_share_1/model_trained/quora',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -140,7 +140,7 @@ flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
 
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
-  def __init__(self, guid, text_a, text_b, labels,entity1=None,entity2=None):
+  def __init__(self, guid, text_a, text_b, labels=None,entity1=None,entity2=None):
     """Constructs a InputExample.
     Args:
       guid: Unique id for the example.
@@ -1077,7 +1077,7 @@ class Bert_classifi(object):
             input_ids=input_ids,
             input_mask=input_mask,
             segment_ids=segment_ids,
-            label_id=[]# label_mask = label_mask
+            label_ids=[]# label_mask = label_mask
         )
         return feature
 
@@ -1098,30 +1098,30 @@ class Bert_classifi(object):
         else:
             print(self.predict_raw_sentence(text1,text2))
 
-# classifi=Bert_classifi()
+classifi=Bert_classifi()
 # classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
 #               'en Typically, each language will have a corresponding reader')
-# print(classifi.predict_raw_sentence('How does the Surface Pro himself 4 compare with iPad Pro?','Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?')[0])
-# i=0
-# directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti')
-# for file in os.listdir(directory):
-#   print(i)
-#   filename = os.fsdecode(file)
-#   filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti',filename)
-#   data={'test_id':[],'is_duplicate':[]}
-#   df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
-#   for index in df.index:
-#     try:
-#         label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
-#                                             +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
-#         print(label)
-        # data['is_duplicate'].append(int(label))
-        # data['test_id'].append(df['test_id'][index])
-    # except:
-    #     data['is_duplicate'].append(0)
-    #     data['test_id'].append(df['test_id'][index])
-    #     pass
-  # data=pd.DataFrame(data)
-  # data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict/'+str(i)+'.csv',index=False,sep=',')
-  # print(filename)
-  # i+=1
+print(classifi.predict_raw_sentence('How can I be a good geologist?','What should I do to be a great geologist?')[0])
+i=0
+directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti')
+for file in os.listdir(directory):
+  print(i)
+  filename = os.fsdecode(file)
+  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti',filename)
+  data={'test_id':[],'is_duplicate':[]}
+  df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
+  for index in df.index:
+    try:
+        label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
+                                            # +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
+        print(label)
+        data['is_duplicate'].append(int(label))
+        data['test_id'].append(df['test_id'][index])
+    except:
+        data['is_duplicate'].append(0)
+        data['test_id'].append(df['test_id'][index])
+        pass
+  data=pd.DataFrame(data)
+  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict1112/'+str(i)+'.csv',index=False,sep=',')
+  print(filename)
+  i+=1
