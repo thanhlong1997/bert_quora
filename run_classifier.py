@@ -1103,7 +1103,7 @@ classifi=Bert_classifi()
 #               'en Typically, each language will have a corresponding reader')
 print(classifi.predict_raw_sentence('How can I be a good geologist?','What should I do to be a great geologist?')[0])
 i=0
-directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti')
+directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/division_test_no_entiti2')
 for file in os.listdir(directory):
   print(i)
   filename = os.fsdecode(file)
