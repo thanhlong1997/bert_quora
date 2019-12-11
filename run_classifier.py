@@ -1107,7 +1107,7 @@ directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/division_test_no_
 for file in os.listdir(directory):
   print(i)
   filename = os.fsdecode(file)
-  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/data_no_add_feature/division_test_no_entiti',filename)
+  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/division_test_no_entiti2',filename)
   data={'test_id':[],'is_duplicate':[]}
   df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
   for index in df.index:
