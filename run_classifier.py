@@ -1114,8 +1114,8 @@ for file in os.listdir(directory):
     try:
         label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
                                             # +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
-        print(label)
-        data['is_duplicate'].append(int(label))
+        # print(label[0])
+        data['is_duplicate'].append(int(label[0]))
         data['test_id'].append(df['test_id'][index])
     except:
         data['is_duplicate'].append(0)
