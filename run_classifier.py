@@ -1098,30 +1098,30 @@ class Bert_classifi(object):
         else:
             print(self.predict_raw_sentence(text1,text2))
 
-classifi=Bert_classifi()
-# classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
-#               'en Typically, each language will have a corresponding reader')
-print(classifi.predict_raw_sentence('How can I be a good geologist?','What should I do to be a great geologist?')[0])
-i=0
-directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/division_test_no_entiti2')
-for file in os.listdir(directory):
-  print(i)
-  filename = os.fsdecode(file)
-  filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/division_test_no_entiti2',filename)
-  data={'test_id':[],'is_duplicate':[]}
-  df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
-  for index in df.index:
-    try:
-        label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
-                                            # +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
-        # print(label[0])
-        data['is_duplicate'].append(int(label[0]))
-        data['test_id'].append(df['test_id'][index])
-    except:
-        data['is_duplicate'].append(0)
-        data['test_id'].append(df['test_id'][index])
-        pass
-  data=pd.DataFrame(data)
-  data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict1112/'+str(i)+'.csv',index=False,sep=',')
-  print(filename)
-  i+=1
+# classifi=Bert_classifi()
+# # classifi.test('vi Thông thường, mỗi ngôn ngữ sẽ có một bộ đọc tương ứng',
+# #               'en Typically, each language will have a corresponding reader')
+# print(classifi.predict_raw_sentence('How can I be a good geologist?','What should I do to be a great geologist?')[0])
+# i=0
+# directory = os.fsencode('./drive/My Drive/AI_COLAB/BERT_tensor/division_test_no_entiti2')
+# for file in os.listdir(directory):
+#   print(i)
+#   filename = os.fsdecode(file)
+#   filename=os.path.join('./drive/My Drive/AI_COLAB/BERT_tensor/division_test_no_entiti2',filename)
+#   data={'test_id':[],'is_duplicate':[]}
+#   df=pd.read_csv(filename, sep='\t', encoding='utf-8', error_bad_lines=False)
+#   for index in df.index:
+#     try:
+#         label=classifi.predict_raw_sentence(str(df['question1'][index]),str(df['question2'][index]))
+#                                             # +' [CLS] '+str(df['entity1'][index]),str(df['q2'][index])+' [SEP] '+str(df['entity2'][index]))[0]
+#         # print(label[0])
+#         data['is_duplicate'].append(int(label[0]))
+#         data['test_id'].append(df['test_id'][index])
+#     except:
+#         data['is_duplicate'].append(0)
+#         data['test_id'].append(df['test_id'][index])
+#         pass
+#   data=pd.DataFrame(data)
+#   data.to_csv('./drive/My Drive/AI_COLAB/BERT_tensor/predict1112/'+str(i)+'.csv',index=False,sep=',')
+#   print(filename)
+#   i+=1
