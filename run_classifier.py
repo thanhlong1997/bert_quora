@@ -44,7 +44,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, '31/12'),
+    "data_dir", os.path.join(project_path, '31_12'),
     "The input datadir.",
 )
 flags.DEFINE_string(
@@ -222,7 +222,7 @@ class UlandProcessor(DataProcessor):
         X1 = []
         X2 = []
         Y=[]
-        df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep=',', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
