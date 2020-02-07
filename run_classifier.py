@@ -26,6 +26,7 @@ import tokenization
 import tensorflow as tf
 import pandas as pd
 import pickle
+import nltk
 import re
 flags = tf.flags
 
@@ -137,7 +138,15 @@ flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
                     'data config file, which save train and dev config')
 
 
-
+class PaddingInputExample(object):
+  """Fake example so the num input examples is a multiple of the batch size.
+  When running eval/predict on the TPU, we need to pad the number of examples
+  to be a multiple of the batch size, because the TPU requires a fixed batch
+  size. The alternative is to drop the last batch, which is bad because it means
+  the entire output data won't be generated.
+  We use this class instead of `None` because treating `None` as padding
+  battches could cause silent errors.
+  """
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
   def __init__(self, guid, text_a, text_b, labels=None,entity1=None,entity2=None):
@@ -206,9 +215,6 @@ class DataProcessor(object):
         y.append(str(int(df['is_duplicate'][i])))
         X1.append(str(df['question1'][i]))
         X2.append(str(df['question2'][i]))
-              # EN1.append(str(df['entity1']))
-              # EN2.append(str(df['entity2']))
-          # print('True:',i)
 
       return (X1, X2, y)
 
@@ -285,9 +291,9 @@ class UlandProcessor(DataProcessor):
         Y=[]
         df = pd.read_csv(os.path.join(data_dir, 'dev.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
-            Y.append(str(int(df['label'][i])))
-            X1.append(str(df['q1'][i]) + ' [CLS] ' + str(df['entity1'][i]))
-            X2.append(str(df['q2'][i]) + ' [SEP] ' + str(df['entity2'][i]))
+            Y.append(str(int(df['is_duplicate'][i])))
+            X1.append(str(df['question1'][i]))
+            X2.append(str(df['question2'][i]))
         num_yes=sum([1 if y=='1' else 0 for y in Y])
         print("------------------------------------------------")
         print('NUM Yes: ', num_yes)
@@ -330,17 +336,24 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     label_map[label] = i
   with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
       pickle.dump(label_map, w)
-
-  tokens_a = tokenizer.tokenize(example.text_a)
+  senten_a=nltk.sent_tokenize(example.text_a)
+  tokens_a=[]
+  for senten in senten_a:
+    tokens_a.append(tokenizer.tokenize(senten))
+  tokena=tokenizer.tokenize(example.text_a)
   tokens_b = None
   if example.text_b:
-    tokens_b = tokenizer.tokenize(example.text_b)
+      senten_b = nltk.sent_tokenize(example.text_b)
+      tokens_b = []
+      for senten in senten_b:
+          tokens_b.append(tokenizer.tokenize(senten))
+  tokenb = tokenizer.tokenize(example.text_b)
 
   if tokens_b:
     # Modifies `tokens_a` and `tokens_b` in place so that the total
     # length is less than the specified length.
     # Account for [CLS], [SEP], [SEP] with "- 3"
-    _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
+    _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - len(tokens_a)-len(tokens_b)-3)
   else:
     # Account for [CLS] and [SEP] with "- 2"
     if len(tokens_a) > max_seq_length - 2:
@@ -368,18 +381,26 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   segment_ids = []
   tokens.append("[CLS]")
   segment_ids.append(0)
-  for token in tokens_a:
-    tokens.append(token)
-    segment_ids.append(0)
-  tokens.append("[SEP]")
+  tokens.append("[unused99]")
   segment_ids.append(0)
+  for senten in tokens_a:
+    for token in senten:
+      tokens.append(token)
+      segment_ids.append(0)
+    tokens.append("[SEP]")
+    segment_ids.append(0)
+  # tokens.append("[SEP]")
+  # segment_ids.append(0)
 
   if tokens_b:
-    for token in tokens_b:
-      tokens.append(token)
+      tokens.append("[unused99]")
       segment_ids.append(1)
-    tokens.append("[SEP]")
-    segment_ids.append(1)
+      for senten in tokens_b:
+          for token in senten:
+              tokens.append(token)
+              segment_ids.append(1)
+          tokens.append("[SEP]")
+          segment_ids.append(1)
 
   input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
@@ -502,14 +523,30 @@ def _truncate_seq_pair(tokens_a, tokens_b, max_length):
   # one token at a time. This makes more sense than truncating an equal percent
   # of tokens from each, since if one sequence is very short then each token
   # that's truncated likely contains more information than a longer sequence.
+
   while True:
-    total_length = len(tokens_a) + len(tokens_b)
+    if len(tokens_a[-1])==0:
+      tokens_a=tokens_a[:-1]
+    if len(tokens_b[-1])==0:
+      tokens_b=tokens_b[:-1]
+    total_length = 0
+    total_len_senten_a = 0
+    total_len_senten_b = 0
+    for senten in tokens_a:
+      total_length +=len(senten)
+      total_len_senten_a+=len(senten)
+    for senten in tokens_b:
+      total_length +=len(senten)
+      total_len_senten_b+=len(senten)
+
     if total_length <= max_length:
       break
-    if len(tokens_a) > len(tokens_b):
-      tokens_a.pop()
+
+
+    if len(total_len_senten_a) > len(total_len_senten_b):
+      tokens_a[-1].pop()
     else:
-      tokens_b.pop()
+      tokens_b[-1].pop()
 
 
 def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
