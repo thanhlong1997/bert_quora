@@ -45,7 +45,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, '31_12'),
+    "data_dir", os.path.join(project_path, '31_12/data_quora'),
     "The input datadir.",
 )
 flags.DEFINE_string(
@@ -84,7 +84,7 @@ flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
 flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.92.96.170:8470' ,
+    "tpu_name",'grpc://10.8.202.66:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -858,14 +858,14 @@ def main(_):
     eval_examples = processor.get_dev_examples(FLAGS.data_dir)
     num_actual_eval_examples = len(eval_examples)
     if FLAGS.use_tpu:
-      pass
+      
       # TPU requires a fixed batch size for all batches, therefore the number
       # of examples must be a multiple of the batch size, or else examples
       # will get dropped. So we pad with fake examples which are ignored
       # later on. These do NOT count towards the metric (all tf.metrics
       # support a per-instance weight, and these get a weight of 0.0).
-      # while len(eval_examples) % FLAGS.eval_batch_size != 0:
-      #   eval_examples.append(PaddingInputExample())
+      while len(eval_examples) % FLAGS.eval_batch_size != 0:
+        eval_examples.append(PaddingInputExample())
 
     eval_file = os.path.join(FLAGS.output_dir, "eval.tf_record")
     file_based_convert_examples_to_features(
