@@ -147,10 +147,10 @@ class PaddingInputExample(object):
   We use this class instead of `None` because treating `None` as padding
   battches could cause silent errors.
   """
-  def __init__(self):
-    self.text_a = ''
-    self.text_b = ''
-    # self.labels = labels
+  # def __init__(self):
+  #   self.text_a = ''
+  #   self.text_b = ''
+  #   # self.labels = labels
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
   def __init__(self, guid, text_a, text_b, labels=None,entity1=None,entity2=None):
@@ -327,13 +327,13 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
                            tokenizer):
   """Converts a single `InputExample` into a single `InputFeatures`."""
 
-  # if isinstance(example, PaddingInputExample):
-  #   return InputFeatures(
-  #       input_ids=[0] * max_seq_length,
-  #       input_mask=[0] * max_seq_length,
-  #       segment_ids=[0] * max_seq_length,
-  #       label_id=0,
-  #       is_real_example=False)
+  if isinstance(example, PaddingInputExample):
+    return InputFeatures(
+        input_ids=[0] * max_seq_length,
+        input_mask=[0] * max_seq_length,
+        segment_ids=[0] * max_seq_length,
+        label_id=0,
+        is_real_example=False)
 
   label_map = {}
   for (i, label) in enumerate(label_list):
