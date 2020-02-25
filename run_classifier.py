@@ -147,8 +147,8 @@ class PaddingInputExample(object):
   We use this class instead of `None` because treating `None` as padding
   battches could cause silent errors.
   """
-  	self.text_a = ''
-    self.text_b = ''
+  self.text_a = ''
+  self.text_b = ''
     # self.labels = labels
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
