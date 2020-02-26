@@ -50,15 +50,9 @@ project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_train_new'),
+    "data_dir", os.path.join(project_path, '31_12/data_quora'),
     "The input datadir.",
 )
-
-flags.DEFINE_string(
-    "test_dir", os.path.join(project_path, 'data_test_new'),
-    "The input datadir.",
-)
-
 flags.DEFINE_string(
     "bert_config_file", os.path.join(bert_path, 'bert_config.json'),
     "The config json file corresponding to the pre-trained BERT model."
@@ -69,7 +63,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'./drive/My Drive/AI_COLAB/model_trained/new_model_912',
+    "output_dir",'gs://test_bucket_share_1/model_trained/model_2_20',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -96,7 +90,7 @@ flags.DEFINE_bool("do_train", True, "Whether to run training.")
 flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.82.8.226:8470' ,
+    "tpu_name",'grpc://10.46.171.90:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -125,7 +119,7 @@ flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-3, "The initial learning rate for Adam.")
 
-flags.DEFINE_float("num_train_epochs", 10.0, "Total number of training epochs to perform.")
+flags.DEFINE_float("num_train_epochs", 5.0, "Total number of training epochs to perform.")
 flags.DEFINE_float('droupout_rate', 0.5, 'Dropout rate')
 flags.DEFINE_float('clip', 5, 'Gradient clip')
 flags.DEFINE_float(
@@ -1153,6 +1147,6 @@ class BertMultilabelClassifier(object):
 
 def run():
     main()
-    cls= BertMultilabelClassifier()
-    cls.test(FLAGS.test_dir)
+    # cls= BertMultilabelClassifier()
+    # cls.test(FLAGS.test_dir)
 run()
