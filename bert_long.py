@@ -282,15 +282,12 @@ class DataProcessor(object):
     X1 = []
     X2 = []
     print(data_dir)
-    df = pd.read_csv(data_dir, sep=',', encoding='utf-8', error_bad_lines=False,engine='python')
+    df = pd.read_csv(data_dir, sep='\t', encoding='utf-8', error_bad_lines=False,engine='python')
     for i in df.index:
-        print(i)
-        try:
-            y.append(str(int(df['is_duplicate'][i])))
-            X1.append(str(df['question1'][i]))
-            X2.append(str(df['question2'][i]))
-        except:
-            pass
+        y.append(str(int(df['is_duplicate'][i])))
+        X1.append(str(df['question1'][i]))
+        X2.append(str(df['question2'][i]))
+
     return (X1, X2, y)
 
   # def read_kepco_multilabel(self,excel_folder):
