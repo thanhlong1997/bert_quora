@@ -45,12 +45,12 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
+bert_path = './drive/My Drive/AI_COLAB/BERT_tensor/uncased_L-12_H-768_A-12'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, '31_12/data_quora'),
+    "data_dir", os.path.join(project_path, 'data_quora'),
     "The input datadir.",
 )
 flags.DEFINE_string(
@@ -63,7 +63,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/model_2_20',
+    "output_dir",'./drive/My Drive/AI_COLAB/BERT_tensor/model_trained/model_2_20',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -87,7 +87,7 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.46.171.90:8470' ,
@@ -109,17 +109,17 @@ tf.flags.DEFINE_string(
 
 flags.DEFINE_bool("do_eval", True, "Whether to run eval on the dev set.")
 
-flags.DEFINE_bool("do_predict", True, "Whether to run the model in inference mode on the test set.")
+flags.DEFINE_bool("do_predict", False, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 4, "Total batch size for training.")
 
-flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
+flags.DEFINE_integer("eval_batch_size", 4, "Total batch size for eval.")
 
-flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
+flags.DEFINE_integer("predict_batch_size", 4, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-3, "The initial learning rate for Adam.")
 
-flags.DEFINE_float("num_train_epochs", 5.0, "Total number of training epochs to perform.")
+flags.DEFINE_float("num_train_epochs", 10.0, "Total number of training epochs to perform.")
 flags.DEFINE_float('droupout_rate', 0.5, 'Dropout rate')
 flags.DEFINE_float('clip', 5, 'Gradient clip')
 flags.DEFINE_float(
@@ -392,8 +392,8 @@ def convert_single_example( example:InputExample, label_list, max_seq_length,
     label_map[label] = i
   # print('LABEL _ LIST: ', label_list)
   # print('LABEL _ MAP : ', label_map)
-  # with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
-      # pickle.dump(label_map, w)
+  with open(os.path.join(FLAGS.data_dir, 'label2id.pkl'), 'wb') as w:
+      pickle.dump(label_map, w)
 
   tokens_a = tokenizer.tokenize(example.text_a)
   tokens_b = tokenizer.tokenize(example.text_b)
@@ -504,7 +504,7 @@ def file_based_convert_examples_to_features(
     features["input_ids"] = create_int_feature(feature.input_ids)
     features["input_mask"] = create_int_feature(feature.input_mask)
     features["segment_ids"] = create_int_feature(feature.segment_ids)
-    features["label_ids"] = create_int_feature([feature.label_ids])
+    features["label_ids"] = create_list_feature(feature.label_ids)
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
     writer.write(tf_example.SerializeToString())
@@ -666,8 +666,6 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
     per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
     # loss = tf.reduce_mean(per_example_loss)
     loss= tf.nn.softmax_cross_entropy_with_logits(labels=one_hot_labels, logits=logits)
-    loss = tf.reduce_mean(loss)
-    loss = tf.Print(loss, [loss], message='loss')
     return (loss, per_example_loss, logits, probabilities)
 
 
@@ -846,15 +844,14 @@ def main():
         "was only trained up to sequence length %d" %
         (FLAGS.max_seq_length, bert_config.max_position_embeddings))
 
-  tf.gfile.MakeDirs(FLAGS.output_dir)
+
+
   task_name = FLAGS.task_name.lower()
 
   if task_name not in processors:
     raise ValueError("Task not found: %s" % (task_name))
 
-  processor = processors[task_name]()
 
-  label_list = processor.get_labels()
 
   tokenizer = tokenization.FullTokenizer(
       vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
@@ -1088,7 +1085,7 @@ class BertMultilabelClassifier(object):
         return pred
 
     def get_test_example(self, folder_dir):
-        return self.processor.get_test_examples(folder_dir)
+        return self.processor.get_train_examples(folder_dir)
 
     def convert_single_prediction_example(self,example, max_seq_length, tokenizer):
         label_list = self.label_list
@@ -1115,8 +1112,7 @@ class BertMultilabelClassifier(object):
         zero=0
         for example in examples:
             # label= example.labels
-            label_ids = [label_map[example.labels]]
-            # for label in example.labels
+            label_ids = [label_map[label] for label in example.labels]
             if len(label_ids)==0:
                 zero+=1
             label = convert_to_k_hot(label_ids, len(label_map))
@@ -1144,6 +1140,5 @@ class BertMultilabelClassifier(object):
 
 def run():
     main()
-    # cls= BertMultilabelClassifier()
-    # cls.test(FLAGS.test_dir)
-run()
+    cls= BertMultilabelClassifier()
+    cls.test(FLAGS.test_dir)
