@@ -26,7 +26,7 @@ import tokenization
 import tensorflow as tf
 import pandas as pd
 import pickle
-import nltk
+# import nltk
 import re
 flags = tf.flags
 
@@ -39,7 +39,8 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
+# bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
+bert_path='./drive/My Drive/AI_COLAB/multi_cased_L-12_H-768_A-12'
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -58,7 +59,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'gs://test_bucket_share_1/model_trained/model_2_20',
+    "output_dir",'./drive/My Drive/AI_COLAB/model_trained/model_2_20',
     "The output directory where the model checkpoints will be written."
 )
 
@@ -82,7 +83,7 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.46.171.90:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
@@ -105,7 +106,7 @@ flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
 flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 32, "Total batch size for training.")
 
 flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
 
@@ -357,7 +358,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     # Modifies `tokens_a` and `tokens_b` in place so that the total
     # length is less than the specified length.
     # Account for [CLS], [SEP], [SEP] with "- 3"
-    _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - len(tokens_a)-len(tokens_b)-3)
+    _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - len(tokens_a)-len(tokens_b)-2)
   else:
     # Account for [CLS] and [SEP] with "- 2"
     if len(tokens_a) > max_seq_length - 2:
@@ -385,8 +386,6 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   segment_ids = []
   tokens.append("[CLS]")
   segment_ids.append(0)
-  tokens.append("[unused99]")
-  segment_ids.append(0)
   for senten in tokens_a:
     for token in senten:
       tokens.append(token)
@@ -397,7 +396,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   # segment_ids.append(0)
 
   if tokens_b:
-      tokens.append("[unused99]")
+      tokens.append("[CLS]")
       segment_ids.append(1)
       for senten in tokens_b:
           for token in senten:
