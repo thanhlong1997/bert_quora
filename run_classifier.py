@@ -28,7 +28,7 @@ import pandas as pd
 import pickle
 import nltk
 import re
-flags = tf.flags
+flags = tf.compat.flags.Flag
 
 FLAGS = flags.FLAGS
 base=os.path.dirname(__file__)
