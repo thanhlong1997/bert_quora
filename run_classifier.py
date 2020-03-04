@@ -42,9 +42,9 @@ print(base)
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
 # bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
 # input=os.path.join(base,'/../../input')
-input='kaggle/input'
+input='/kaggle/input'
 # output=os.path.join(base,'/../../output')
-output='kaggle/output'
+output='/kaggle/output'
 bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12/uncased_L-12_H-768_A-12')
 print(bert_path)
 # project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
