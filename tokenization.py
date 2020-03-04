@@ -23,7 +23,7 @@ import re
 import unicodedata
 import six
 import tensorflow as tf
-
+import pandas as pd
 
 def validate_case_matches_checkpoint(do_lower_case, init_checkpoint):
   """Checks whether the casing config is consistent with the checkpoint name."""
@@ -83,6 +83,7 @@ def convert_to_unicode(text):
     elif isinstance(text, bytes):
       return text.decode("utf-8", "ignore")
     else:
+      print(text)
       raise ValueError("Unsupported string type: %s" % (type(text)))
   elif six.PY2:
     if isinstance(text, str):
@@ -93,7 +94,7 @@ def convert_to_unicode(text):
       raise ValueError("Unsupported string type: %s" % (type(text)))
   else:
     raise ValueError("Not running on Python2 or Python 3?")
-
+# print(convert_to_unicode('where is HaNoi ?'))
 
 def printable_text(text):
   """Returns text encoded in a way suitable for print or `tf.logging`."""
@@ -122,7 +123,7 @@ def load_vocab(vocab_file):
   """Loads a vocabulary file into a dictionary."""
   vocab = collections.OrderedDict()
   index = 0
-  with tf.gfile.GFile(vocab_file, "r") as reader:
+  with tf.compat.v1.io.gfile.GFile(vocab_file, "r") as reader:
     while True:
       token = convert_to_unicode(reader.readline())
       if not token:
@@ -405,5 +406,69 @@ def _is_punctuation(char):
   if cat.startswith("P"):
     return True
   return False
-# token=FullTokenizer("E:\\Research\\multi_cased_L-12_H-768_A-12\\vocab.txt")
-# print(token.tokenize("Đại học bách khoa Hà Nội"))
+
+
+
+def clear_text(text):
+    text = str(text)
+    # Clean the text
+    # text = re.sub(r'[0-9]','',text)
+    text = re.sub(r"[^A-Za-z^,!.\/0-9?']", " ", text)
+    text = re.sub(r"what's", "what is ", text)
+    text = re.sub(r"\'s", " ", text)
+    text = re.sub(r"\'ve", " have ", text)
+    text = re.sub(r"can't", "cannot ", text)
+    text = re.sub(r"n't", " not ", text)
+    text = re.sub(r"i'm", "i am ", text)
+    text = re.sub(r"\'re", " are ", text)
+    text = re.sub(r"\'d", " would ", text)
+    text = re.sub(r"\'ll", " will ", text)
+    text = re.sub(r",", " ", text)
+    text = re.sub(r"\.", " ", text)
+    text = re.sub(r"!", " ! ", text)
+    text = re.sub(r"\/", " ", text)
+    text = re.sub(r"\^", " ^ ", text)
+    text = re.sub(r"\+", " + ", text)
+    text = re.sub(r"\-", " - ", text)
+    text = re.sub(r"\=", " = ", text)
+    text = re.sub(r"'", " ", text)
+    text = re.sub(r"(\d+)(k)", r"\g<1>000", text)
+    text = re.sub(r":", " : ", text)
+    text = re.sub(r" e g ", " eg ", text)
+    text = re.sub(r" b g ", " bg ", text)
+    text = re.sub(r" u s ", " american ", text)
+    text = re.sub(r"\0s", "0", text)
+    text = re.sub(r" 9 11 ", "911", text)
+    text = re.sub(r"e - mail", "email", text)
+    text = re.sub(r"j k", "jk", text)
+    text = re.sub(r"\s{2,}", " ", text)
+    text = text.strip()
+    return text
+
+
+
+# data={'q1':[],'q2':[],'label':[],'entity1':[],'entity2':[]}
+# token=FullTokenizer("E:\\Research\\multi_cased_L-12_H-768_A-12\\multi_cased_L-12_H-768_A-12\\vocab.txt",do_lower_case=True)
+# # print([token.tokenize(convert_to_unicode("Đại học bách khoa Hà Nội"))].extend([token.tokenize(convert_to_unicode('lương thành long'))]))
+# token2=[]
+# for item in token.tokenize(convert_to_unicode("Đại học bách khoa Hà Nội")):
+#   token2.append(item)
+# for item in token.tokenize(convert_to_unicode("Đại học bách khoa Hà Nội")):
+#   token2.append(item)
+# print(token2)
+# 2/0
+# df = pd.read_csv("quora_add_features_2.tsv",delimiter='\t',encoding='utf-8',error_bad_lines=False)
+# for index in df.index:
+#   try:
+#     if len(token.tokenize(convert_to_unicode(df['q1'][index])))+len(token.tokenize(convert_to_unicode(df['q2'][index])))+len(token.tokenize(convert_to_unicode(df['entity1'][index])))+len(token.tokenize(convert_to_unicode(df['entity2'][index])))>=512-20:
+#       print(index)
+#       continue
+#     data['q1'].append(clear_text(str(df['q1'][index])))
+#     data['q2'].append(clear_text(str(df['q2'][index])))
+#     data['label'].append(df['label'][index])
+#     data['entity1'].append(str(df['entity1'][index]))
+#     data['entity2'].append(str(df['entity2'][index]))
+#   except:
+#     pass
+# data=pd.DataFrame(data)
+# data.to_csv('quora_add_features_3.tsv', index=False,sep='\t')
