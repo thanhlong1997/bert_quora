@@ -43,6 +43,7 @@ base=os.path.dirname(__file__)
 input=os.path.join(base,'/../../')
 output=os.path.join(base,'/../../output')
 bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12')
+print(bert_path)
 # project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
