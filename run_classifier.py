@@ -139,7 +139,7 @@ flags.DEFINE_string("vocab_file", os.path.join(bert_path, 'vocab.txt'),
 
 tf.flags.DEFINE_string("master", None, "[Optional] TensorFlow master URL.")
 flags.DEFINE_integer(
-    "num_tpu_cores", 8,
+    "num_tpu_cores", 1,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
 flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
                     'data config file, which save train and dev config')
@@ -239,7 +239,7 @@ class UlandProcessor(DataProcessor):
         X1 = []
         X2 = []
         Y=[]
-        df = pd.read_csv(os.path.join(data_dir, 'train_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir, 'dev_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
