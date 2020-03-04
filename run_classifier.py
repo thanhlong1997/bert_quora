@@ -89,7 +89,7 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name",'grpc://10.0.0.2:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
@@ -114,7 +114,7 @@ flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mod
 
 flags.DEFINE_integer("train_batch_size", 1, "Total batch size for training.")
 
-flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
+flags.DEFINE_integer("eval_batch_size", 1, "Total batch size for eval.")
 
 flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
@@ -239,7 +239,7 @@ class UlandProcessor(DataProcessor):
         X1 = []
         X2 = []
         Y=[]
-        df = pd.read_csv(os.path.join(data_dir, 'dev_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir, 'train_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
