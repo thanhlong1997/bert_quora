@@ -32,6 +32,7 @@ flags = tf.flags
 
 FLAGS = flags.FLAGS
 base=os.path.dirname(__file__)
+print(base)
 ## Required parameters
 # if os.name == 'nt':
 #     bert_path = 'D:\\Research\\multi_cased_L-12_H-768_A-12'
