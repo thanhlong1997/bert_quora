@@ -41,7 +41,7 @@ print(base)
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
 # bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
-input=os.path.join(base,'/../../')
+input=os.path.join(base,'/../../input')
 output=os.path.join(base,'/../../output')
 bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12/uncased_L-12_H-768_A-12')
 print(bert_path)
