@@ -44,7 +44,7 @@ print(base)
 # input=os.path.join(base,'/../../input')
 input='/kaggle/input'
 # output=os.path.join(base,'/../../output')
-output='/kaggle/output'
+output='/kaggle/working/model_trained'
 bert_path=os.path.join(input,'pretrained-bert-including-scripts/uncased_L-12_H-768_A-12/uncased_L-12_H-768_A-12')
 print(bert_path)
 project_path='/kaggle/working/bert_quora'
@@ -239,7 +239,7 @@ class UlandProcessor(DataProcessor):
         X1 = []
         X2 = []
         Y=[]
-        df = pd.read_csv(os.path.join(data_dir, 'train_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir, 'dev_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
