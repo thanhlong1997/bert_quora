@@ -31,7 +31,7 @@ import re
 flags = tf.flags
 
 FLAGS = flags.FLAGS
-base='./bert_quora'
+base=os.path.dirname(__file__)
 ## Required parameters
 # if os.name == 'nt':
 #     bert_path = 'D:\\Research\\multi_cased_L-12_H-768_A-12'
@@ -40,8 +40,8 @@ base='./bert_quora'
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
 # bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
-input='../../../input'
-output='../../../output'
+input=os.path.join(base,'/../../')
+output=os.path.join(base,'/../../output')
 bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12')
 # project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
