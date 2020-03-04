@@ -45,9 +45,9 @@ print(base)
 input='/kaggle/input'
 # output=os.path.join(base,'/../../output')
 output='/kaggle/output'
-bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12/uncased_L-12_H-768_A-12')
+bert_path=os.path.join(input,'pretrained-bert-including-scripts/uncased_L-12_H-768_A-12/uncased_L-12_H-768_A-12')
 print(bert_path)
-# project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
+project_path='/kaggle/working/bert_quora'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
@@ -141,8 +141,8 @@ tf.flags.DEFINE_string("master", None, "[Optional] TensorFlow master URL.")
 flags.DEFINE_integer(
     "num_tpu_cores", 8,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
-# flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
-#                     'data config file, which save train and dev config')
+flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
+                    'data config file, which save train and dev config')
 
 
 class PaddingInputExample(object):
