@@ -43,7 +43,7 @@ print(base)
 # bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
 input=os.path.join(base,'/../../')
 output=os.path.join(base,'/../../output')
-bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12')
+bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12/uncased_L-12_H-768_A-12')
 print(bert_path)
 # project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
