@@ -666,7 +666,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
     per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
     # loss = tf.reduce_mean(per_example_loss)
     loss= tf.nn.softmax_cross_entropy_with_logits(labels=one_hot_labels, logits=logits)
-    return (loss, per_example_loss, logits, probabilities)
+  return (loss, per_example_loss, logits, probabilities)
 
 
 def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,

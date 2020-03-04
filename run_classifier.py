@@ -26,7 +26,7 @@ import tokenization
 import tensorflow as tf
 import pandas as pd
 import pickle
-# import nltk
+import nltk
 import re
 flags = tf.flags
 
@@ -40,13 +40,15 @@ base='./bert_quora'
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
 # bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
-bert_path='./drive/My Drive/AI_COLAB/multi_cased_L-12_H-768_A-12'
-project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
+input='../../../input'
+output='../../../output'
+bert_path=os.path.join(input,'Pre-trained BERT, including scripts/uncased_L-12_H-768_A-12')
+# project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, '31_12/data_quora'),
+    "data_dir", os.path.join(input, 'longquora'),
     "The input datadir.",
 )
 flags.DEFINE_string(
@@ -59,7 +61,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'./drive/My Drive/AI_COLAB/model_trained/model_2_20',
+    "output_dir",os.path.join(output,'model_2_20'),
     "The output directory where the model checkpoints will be written."
 )
 
@@ -83,9 +85,9 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
-    "tpu_name",'grpc://10.46.171.90:8470' ,
+    "tpu_name",'grpc://10.0.0.2:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -135,8 +137,8 @@ tf.flags.DEFINE_string("master", None, "[Optional] TensorFlow master URL.")
 flags.DEFINE_integer(
     "num_tpu_cores", 8,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
-flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
-                    'data config file, which save train and dev config')
+# flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
+#                     'data config file, which save train and dev config')
 
 
 class PaddingInputExample(object):
@@ -233,7 +235,7 @@ class UlandProcessor(DataProcessor):
         X1 = []
         X2 = []
         Y=[]
-        df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir, 'dev_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
@@ -528,22 +530,24 @@ def _truncate_seq_pair(tokens_a, tokens_b, max_length):
   # that's truncated likely contains more information than a longer sequence.
 
   while True:
-    if len(tokens_a[-1])==0:
-      tokens_a=tokens_a[:-1]
-    if len(tokens_b[-1])==0:
-      tokens_b=tokens_b[:-1]
     total_length = 0
     total_len_senten_a = 0
     total_len_senten_b = 0
     for senten in tokens_a:
-      total_length +=len(senten)
-      total_len_senten_a+=len(senten)
+      total_length += len(senten)
+      total_len_senten_a += len(senten)
     for senten in tokens_b:
-      total_length +=len(senten)
-      total_len_senten_b+=len(senten)
+      total_length += len(senten)
+      total_len_senten_b += len(senten)
 
     if total_length <= max_length:
       break
+    print(tokens_a)
+    if len(tokens_a[-1])==0:
+      tokens_a=tokens_a[:-1]
+    if len(tokens_b[-1])==0:
+      tokens_b=tokens_b[:-1]
+
 
 
     if len(total_len_senten_a) > len(total_len_senten_b):
