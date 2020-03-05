@@ -42,12 +42,12 @@ print(base)
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
 # bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
 # input=os.path.join(base,'/../../input')
-input='/kaggle/input'
+input='./drive/My Drive/AI_COLAB'
 # output=os.path.join(base,'/../../output')
-output='/kaggle/working/model_trained'
-bert_path=os.path.join(input,'pretrained-bert-including-scripts/uncased_L-12_H-768_A-12/uncased_L-12_H-768_A-12')
+output='./drive/My Drive/AI_COLAB/model_trained'
+bert_path=os.path.join(input,'uncased_L-12_H-768_A-12')
 print(bert_path)
-project_path='/kaggle/working/bert_quora'
+project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
@@ -577,7 +577,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
   # If you want to use the token-level output, use model.get_sequence_output()
   # instead.
   output_layer = model.get_pooled_output()
-
+  print('output shape',output_layer.shape)
   hidden_size = bert_config.hidden_size # output_layer.shape[-1].value
 
   output_weights = tf.get_variable(
