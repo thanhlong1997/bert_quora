@@ -27,27 +27,31 @@ flags = tf.flags
 
 FLAGS = flags.FLAGS
 
+input='./drive/My Drive/AI_COLAB'
+output='./drive/My Drive/AI_COLAB/model_trained'
+bert_path=os.path.join(input,'uncased_L-12_H-768_A-12')
+project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 flags.DEFINE_string(
-	"data_dir", None,
+	"data_dir", os.path.join(project_path,'ner'),
 	"The input datadir. ex) 'NERdata'"
 )
 
 flags.DEFINE_string(
-	"bert_config_file", None,
-	"The config json file corresponding to the pre-trained BERT model. ex) 'bert_config.json'"
+    "bert_config_file", os.path.join(bert_path, 'bert_config.json'),
+    "The config json file corresponding to the pre-trained BERT model."
 )
 
 flags.DEFINE_string(
-	"task_name", None, "The name of the task to train. ex) 'NER'"
+	"task_name", 'Uland', "The name of the task to train. ex) 'NER'"
 )
 
 flags.DEFINE_string(
-	"output_dir", None,
+	"output_dir", os.path.join(output,'model_ner'),
 	"The output directory where the model checkpoints will be written. ex) 'output'"
 )
 
 flags.DEFINE_string(
-	"init_checkpoint", "bert_model.ckpt",
+	"init_checkpoint", os.path.join(bert_path, 'bert_model.ckpt'),
 	"Initial checkpoint (usually from a pre-trained BERT model)."
 )
 
@@ -105,7 +109,7 @@ flags.DEFINE_integer("keep_checkpoint_max", 20,
 flags.DEFINE_integer("iterations_per_loop", 1000,
 					 "How many steps to make in each estimator call.")
 
-flags.DEFINE_string("vocab_file", None,
+flags.DEFINE_string("vocab_file", os.path.join(bert_path, 'vocab.txt'),
 					"The vocabulary file that the BERT model was trained on. ex) 'vocab.txt'")
 
 flags.DEFINE_string("master", None, "[Optional] TensorFlow master URL.")
@@ -622,7 +626,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
 def main(_):
 	tf.logging.set_verbosity(tf.logging.INFO)
 	processors = {
-		"ner": NerProcessor
+		"uland": NerProcessor,
 	}
 
 	bert_config = modeling.BertConfig.from_json_file(FLAGS.bert_config_file)
