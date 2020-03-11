@@ -352,7 +352,7 @@ def filed_based_convert_examples_to_features(examples, label_list, max_seq_lengt
 	label_map = {}
 	for (i, label) in enumerate(label_list, 1):  # 0 index for '0' padding
 		label_map[label] = i
-	with codecs.open('./output/label2id.pkl', 'wb') as w:
+	with codecs.open(os.path.join(project_path,'/ner/label2id.pkl', 'wb')) as w:
 		pickle.dump(label_map, w)
 
 	# convert examples => features => tf_examples(tf.train.Example) => tf records(TFRecord, file)
