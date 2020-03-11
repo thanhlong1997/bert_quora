@@ -929,7 +929,7 @@ def main():
         is_training=True,
         drop_remainder=True)
     estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
-
+main()
 
 import re
 class BertMultilabelClassifier(object):
@@ -1146,7 +1146,7 @@ class BertMultilabelClassifier(object):
         print('ACC: ',accuracy_score(Y_true, Y_test))
 
 
-def run():
-    main()
-    cls= BertMultilabelClassifier()
-    cls.test(FLAGS.test_dir)
+# def run():
+#     main()
+#     cls= BertMultilabelClassifier()
+#     cls.test(FLAGS.test_dir)
