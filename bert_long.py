@@ -37,7 +37,8 @@ flags = tf.flags
 FLAGS = flags.FLAGS
 
 ## Required parameters
-base='./bert_quora'
+base=os.path.dirname(__file__)
+print(base)
 ## Required parameters
 # if os.name == 'nt':
 #     bert_path = 'D:\\Research\\multi_cased_L-12_H-768_A-12'
@@ -45,12 +46,19 @@ base='./bert_quora'
 # else:
 #     # bert_path = '/home/linhlt/matt/bert_ner/bert-models/multi_cased_L-12_H-768_A-12'
 #     # root_path = '/home/linhlt/Levi/chatbot_platform_nlp'
-bert_path = './drive/My Drive/AI_COLAB/BERT_tensor/uncased_L-12_H-768_A-12'
+# bert_path = 'gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
+# input=os.path.join(base,'/../../input')
+input='./drive/My Drive/AI_COLAB'
+# output=os.path.join(base,'/../../output')
+output='./drive/My Drive/AI_COLAB/model_trained'
+bert_path=os.path.join(input,'uncased_L-12_H-768_A-12')
+print(bert_path)
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
+# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'data_quora'),
+    "data_dir", os.path.join(project_path, 'longquora'),
     "The input datadir.",
 )
 flags.DEFINE_string(
@@ -63,7 +71,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",'./drive/My Drive/AI_COLAB/BERT_tensor/model_trained/model_2_20',
+    "output_dir",os.path.join(output,'model_2_20_2'),
     "The output directory where the model checkpoints will be written."
 )
 
@@ -303,7 +311,7 @@ class UlandProcessor(DataProcessor):
 
     def get_train_examples(self, data_dir):
         """See base class."""
-        (X_sent,X_title, Y) = self._read_csv(os.path.join(data_dir,'train.tsv'))
+        (X_sent,X_title, Y) = self._read_csv(os.path.join(data_dir,'dev_quora.tsv'))
         # Y=[[tag for tag in y if tag in ai_const.all_tags] for y in Y]
         # print('LEN NO TAG: ', )
         num_yes = sum([1 if y == '0' else 0 for y in Y])
