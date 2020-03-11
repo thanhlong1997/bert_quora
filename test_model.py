@@ -526,9 +526,18 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
   #
   # If you want to use the token-level output, use model.get_sequence_output()
   # instead.
-  output_layer = model.get_pooled_output()
-
-  hidden_size = output_layer.shape[-1].value
+  # output_layer = model.get_pooled_output()
+  all_layers = model.get_all_encoder_layers()
+  print('CLS shape:',all_layers[-1][0].shape)
+  first_token_tensor_layer1 = tf.squeeze(all_layers[-1][:, 0:1, :], axis=1)
+  first_token_tensor_layer2 = tf.squeeze(all_layers[-2][:, 0:1, :], axis=1)
+  first_token_tensor_layer3 = tf.squeeze(all_layers[-3][:, 0:1, :], axis=1)
+  first_token_tensor_layer4 = tf.squeeze(all_layers[-4][:, 0:1, :], axis=1)
+  output_layer= tf.concat(values=[first_token_tensor_layer1, first_token_tensor_layer2], axis=1)
+  output_layer= tf.concat(values=[output_layer, first_token_tensor_layer3], axis=1)
+  output_layer = tf.concat(values=[output_layer, first_token_tensor_layer4], axis=1)
+  print('OUTPUT shape:',output_layer.shape)
+  hidden_size =  4* bert_config.hidden_size#output_layer.shape[-1].value
 
   output_weights = tf.get_variable(
       "output_weights", [num_labels, hidden_size],
