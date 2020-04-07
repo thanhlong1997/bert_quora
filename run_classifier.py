@@ -25,9 +25,9 @@ import optimization
 import tokenization
 import tensorflow as tf
 import pandas as pd
-import pickle
-import nltk
-import re
+# import pickle
+# import nltk
+# import re
 flags = tf.compat.v1.flags
 
 FLAGS = flags.FLAGS
@@ -517,32 +517,14 @@ def _truncate_seq_pair(tokens_a, tokens_b, max_length):
   # one token at a time. This makes more sense than truncating an equal percent
   # of tokens from each, since if one sequence is very short then each token
   # that's truncated likely contains more information than a longer sequence.
-
   while True:
-    total_length = 0
-    total_len_senten_a = 0
-    total_len_senten_b = 0
-    for senten in tokens_a:
-      total_length += len(senten)
-      total_len_senten_a += len(senten)
-    for senten in tokens_b:
-      total_length += len(senten)
-      total_len_senten_b += len(senten)
-
+    total_length = len(tokens_a) + len(tokens_b)
     if total_length <= max_length:
       break
-    print(tokens_a)
-    if len(tokens_a[-1])==0:
-      tokens_a=tokens_a[:-1]
-    if len(tokens_b[-1])==0:
-      tokens_b=tokens_b[:-1]
-
-
-
-    if len(total_len_senten_a) > len(total_len_senten_b):
-      tokens_a[-1].pop()
+    if len(tokens_a) > len(tokens_b):
+      tokens_a.pop()
     else:
-      tokens_b[-1].pop()
+      tokens_b.pop()
 
 
 def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
