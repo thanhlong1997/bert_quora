@@ -52,7 +52,7 @@ root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(input, 'longquora'),
+    "data_dir", os.path.join(project_path, 'longquora'),
     "The input datadir.",
 )
 flags.DEFINE_string(
@@ -65,7 +65,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",os.path.join(output,'model_2_20'),
+    "output_dir",os.path.join(output,'model_4_7'),
     "The output directory where the model checkpoints will be written."
 )
 
@@ -112,9 +112,9 @@ flags.DEFINE_bool("do_eval",True, "Whether to run eval on the dev set.")
 
 flags.DEFINE_bool("do_predict",False, "Whether to run the model in inference mode on the test set.")
 
-flags.DEFINE_integer("train_batch_size", 1, "Total batch size for training.")
+flags.DEFINE_integer("train_batch_size", 8, "Total batch size for training.")
 
-flags.DEFINE_integer("eval_batch_size", 1, "Total batch size for eval.")
+flags.DEFINE_integer("eval_batch_size", 8, "Total batch size for eval.")
 
 flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
