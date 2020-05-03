@@ -215,10 +215,7 @@ class BertModel(object):
             initializer_range=config.initializer_range,
             do_return_all_layers=True)
 
-      self.sequence_output   = self.all_encoder_layers[-1]
-      self.sequence_output_1 = self.all_encoder_layers[-2]
-      self.sequence_output_2 = self.all_encoder_layers[-3]
-      self.sequence_output_3 = self.all_encoder_layers[-4]
+      self.sequence_output = self.all_encoder_layers[-1]
       # The "pooler" converts the encoded sequence tensor of shape
       # [batch_size, seq_length, hidden_size] to a tensor of shape
       # [batch_size, hidden_size]. This is necessary for segment-level
@@ -228,14 +225,8 @@ class BertModel(object):
         # We "pool" the model by simply taking the hidden state corresponding
         # to the first token. We assume that this has been pre-trained
         first_token_tensor = tf.squeeze(self.sequence_output[:, 0:1, :], axis=1)
-        second_token_tensor = tf.squeeze(self.sequence_output_1[:, 0:1, :], axis=1)
-        third_token_tensor = tf.squeeze(self.sequence_output_2[:, 0:1, :], axis=1)
-        four_token_tensor = tf.squeeze(self.sequence_output_3[:, 0:1, :], axis=1)
-        output_layer = tf.concat(values=[first_token_tensor, second_token_tensor], axis=1)
-        output_layer = tf.concat(values=[output_layer, third_token_tensor], axis=1)
-        output_layer = tf.concat(values=[output_layer, four_token_tensor], axis=1)
         self.pooled_output = tf.layers.dense(
-            output_layer,
+            first_token_tensor,
             config.hidden_size,
             activation=tf.tanh,
             kernel_initializer=create_initializer(config.initializer_range))
