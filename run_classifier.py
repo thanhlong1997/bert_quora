@@ -44,15 +44,15 @@ print(base)
 # input=os.path.join(base,'/../../input')
 input='./drive/My Drive/AI_COLAB'
 # output=os.path.join(base,'/../../output')
-output='./drive/My Drive/AI_COLAB/model_trained'
-bert_path=os.path.join(input,'uncased_L-12_H-768_A-12')
+output='gs://test_bucket_share_1/model_trained'
+bert_path='gs://test_bucket_share_1/uncased_L-12_H-768_A-12'
 print(bert_path)
 project_path='./drive/My Drive/AI_COLAB/BERT_tensor'
 root_path = base
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 flags.DEFINE_string(
-    "data_dir", os.path.join(project_path, 'longquora'),
+    "data_dir", './drive/My Drive/Adobe-Hust cooperation/huy/final_data',
     "The input datadir.",
 )
 flags.DEFINE_string(
@@ -65,7 +65,7 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "output_dir",os.path.join(output,'model_4_7'),
+    "output_dir",os.path.join(output,'model_human_fix_label_data'),
     "The output directory where the model checkpoints will be written."
 )
 
@@ -81,7 +81,7 @@ flags.DEFINE_bool(
 )
 
 flags.DEFINE_integer(
-    "max_seq_length", 512,
+    "max_seq_length", 256,
     "The maximum total input sequence length after WordPiece tokenization."
 )
 
@@ -89,9 +89,9 @@ flags.DEFINE_boolean('clean', True, 'remove the files which created by last trai
 
 flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
+flags.DEFINE_bool("use_tpu", True, "Whether to use TPU or GPU/CPU.")
 flags.DEFINE_string(
-    "tpu_name",'grpc://10.0.0.2:8470' ,
+    "tpu_name",'grpc://10.15.19.74:8470' ,
     "The Cloud TPU to use for training. This should be either the name "
     "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
     "url.")
@@ -120,7 +120,7 @@ flags.DEFINE_integer("predict_batch_size", 8, "Total batch size for predict.")
 
 flags.DEFINE_float("learning_rate", 5e-5, "The initial learning rate for Adam.")
 
-flags.DEFINE_float("num_train_epochs", 10.0, "Total number of training epochs to perform.")
+flags.DEFINE_float("num_train_epochs", 20.0, "Total number of training epochs to perform.")
 flags.DEFINE_float('droupout_rate', 0.5, 'Dropout rate')
 flags.DEFINE_float('clip', 5, 'Gradient clip')
 flags.DEFINE_float(
@@ -139,7 +139,7 @@ flags.DEFINE_string("vocab_file", os.path.join(bert_path, 'vocab.txt'),
 
 flags.DEFINE_string("master", None, "[Optional] TensorFlow master URL.")
 flags.DEFINE_integer(
-    "num_tpu_cores", 1,
+    "num_tpu_cores", 8,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
 flags.DEFINE_string('data_config_path', os.path.join(project_path, 'data.conf'),
                     'data config file, which save train and dev config')
@@ -235,11 +235,11 @@ class UlandProcessor(DataProcessor):
 
     def get_train_examples(self, data_dir):
         """See base class."""
-        print('PATH', os.path.join(data_dir, 'train_quora.tsv'))
+        print('PATH', os.path.join(data_dir, 'train.tsv'))
         X1 = []
         X2 = []
         Y=[]
-        df = pd.read_csv(os.path.join(data_dir, 'train_quora.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
+        df = pd.read_csv(os.path.join(data_dir, 'train.tsv'), sep='\t', encoding='utf-8', error_bad_lines=False)
         for i in df.index:
             Y.append(str(int(df['is_duplicate'][i])))
             X1.append(str(df['question1'][i]))
